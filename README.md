@@ -1,2 +1,5 @@
-# horse-racing-management-system
-Capstone Project - Horse Racing Tournament Management System - UTH
+# HOTEL ROOM BOOKING SYSTEM
+
+Software Engineering Course Project - University of Transport in Ho Chi Minh City (UTH)  
+**Group Code:** 07  
+**Topic:** Hotel Room Booking System

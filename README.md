@@ -67,3 +67,21 @@ hotel-room-booking-system/
 ├── .gitignore        # Files and folders ignored by Git
 ├── README.md         # Project documentation file
 └── requirements.txt  # List of required Python dependencies 
+
+ ## ⚙️ Installation & Run
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/THUNGO-dot/hotel-room-booking-system.git
+   cd hotel-room-booking-system
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run the application:
+   ```bash
+   python src/main.py
+   ```

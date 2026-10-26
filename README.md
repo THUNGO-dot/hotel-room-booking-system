@@ -67,7 +67,9 @@ hotel-room-booking-system/
 ├── .gitignore        # Files and folders ignored by Git
 ├── README.md         # Project documentation file
 └── requirements.txt  # List of required Python dependencies 
-
+```
+---
+ 
  ## ⚙️ Installation & Run
 
 1. Clone the repository:

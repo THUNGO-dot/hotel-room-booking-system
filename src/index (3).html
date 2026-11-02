@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand Horizon Hotel – Booking System Interface Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pine:#14372f; --pine-2:#1f4e43; --pine-d:#0c241e; --pine-l:#e3ece8;
+  --brass:#b8935a; --brass-d:#86622c; --brass-l:#f3ead8; --gold:#d3ae6e; --gold-h:#dcba80;
+  --paper:#f4f2ed; --card:#fff; --line:#dfdbd0; --line-2:#ebe8df; --wash:#faf9f5;
+  --ink:#1b2420; --muted:#59635e; --faint:#88918c;
+  --ok:#2c6a4d; --ok-bg:#e2eee7; --warn:#80540f; --warn-bg:#f6ebd2; --bad:#9a2c3a; --bad-bg:#f6e3e6; --info:#2d5876; --info-bg:#e1eaf0; --mute-bg:#ebe8df;
+  --r:3px; --r-lg:4px;
+  --display:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font:400 15px/1.6 var(--body);color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;letter-spacing:0;line-height:1.12}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ic.sm{width:16px;height:16px}.ic.lg{width:24px;height:24px}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px;border-radius:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.hide{display:none!important}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+
+/* ---------- shell ---------- */
+.util{background:var(--pine-d);color:#aebfb8;font-size:13px}
+.util .wrap{display:flex;align-items:center;gap:14px;min-height:42px;padding-top:6px;padding-bottom:6px}
+.util .lbl{margin-right:2px}
+.seg{display:inline-flex;gap:2px;background:rgba(255,255,255,.08);padding:3px;border-radius:var(--r)}
+.seg button{padding:4px 14px;border-radius:2px;font-size:13px;font-weight:500;color:#c4d2cc;transition:background .15s,color .15s}
+.seg button:hover{color:#fff}
+.seg button.on{background:var(--paper);color:var(--pine);font-weight:600}
+.ulink{margin-left:auto;display:inline-flex;gap:8px;align-items:center;color:#c4d2cc;font-weight:500;padding:4px 2px;border-bottom:1px solid transparent}
+.ulink:hover,.ulink.on{color:#fff;border-bottom-color:var(--brass)}
+.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+.site .wrap{display:flex;align-items:center;gap:36px;min-height:80px}
+.brand{display:flex;align-items:center;gap:12px;color:var(--pine)}
+.brand svg{width:34px;height:34px;flex:none}
+.brand b{font:600 29px/1 var(--display);letter-spacing:.005em;white-space:nowrap}
+.nav{display:flex;align-self:stretch;gap:26px;margin-right:auto}
+.nav button{position:relative;display:flex;align-items:center;font-weight:500;font-size:15px;color:var(--muted);padding:0 2px;white-space:nowrap;transition:color .15s}
+.nav button:hover{color:var(--ink)}
+.nav button.on{color:var(--pine);font-weight:600}
+.nav button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--brass)}
+.who{display:flex;align-items:center;gap:12px}
+.avatar{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--brass);color:var(--pine);display:grid;place-items:center;font:700 14px var(--body);background:var(--brass-l)}
+.who b{display:block;font-size:14px;line-height:1.25}.who small{color:var(--muted);font-size:13px}
+main{max-width:1240px;margin:0 auto;padding:0 32px 72px;outline:0}
+.ph{padding:44px 0 26px}
+.ph h1{font-size:46px;color:var(--pine);font-weight:600}
+.ph p{color:var(--muted);font-size:16px;margin-top:8px;max-width:62ch}
+.foot{border-top:1px solid var(--line);background:#fff;color:var(--muted);font-size:13px}
+.foot .wrap{padding-top:20px;padding-bottom:20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* ---------- controls ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--r);background:var(--pine);color:#fff;font-weight:600;font-size:14.5px;border:1px solid var(--pine);letter-spacing:.01em;transition:background .15s,border-color .15s,transform .05s}
+.btn:hover{background:var(--pine-2);border-color:var(--pine-2)}.btn:active{transform:translateY(1px)}
+.btn.ghost{background:#fff;color:var(--pine);border-color:#cfcabd}.btn.ghost:hover{background:var(--wash);border-color:var(--pine)}
+.btn.sun{background:var(--gold);border-color:var(--gold);color:var(--pine-d)}.btn.sun:hover{background:var(--gold-h);border-color:var(--gold-h)}
+.btn.ok{background:var(--ok);border-color:var(--ok)}.btn.ok:hover{background:#235640;border-color:#235640}
+.btn.bad{background:#fff;color:var(--bad);border-color:#e3bcc2}.btn.bad:hover{background:var(--bad-bg)}
+.btn{white-space:nowrap}.dlg-f .btn,.btn.block{white-space:normal;text-align:center}
+.btn.sm{padding:7px 14px;font-size:13.5px}.btn.block{width:100%}.btn.lg{padding:13px 26px;font-size:15.5px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.icon-btn{width:36px;height:36px;border-radius:var(--r);display:grid;place-items:center;color:var(--muted)}.icon-btn:hover{background:var(--paper);color:var(--ink)}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.field>span{font-size:13.5px;font-weight:600;color:var(--ink)}
+.input{width:100%;height:44px;padding:0 13px;background:#fff;border:1px solid #cdc8bb;border-radius:var(--r);outline:0;transition:border-color .15s,box-shadow .15s}
+textarea.input{height:auto;padding:11px 13px;resize:vertical}
+.input:focus{border-color:var(--pine);box-shadow:0 0 0 3px rgba(184,147,90,.35)}
+.input[disabled],.input[readonly]{background:var(--wash);color:var(--faint)}
+.err{color:var(--bad);font-size:13.5px;display:flex;gap:6px;align-items:center}
+.hint{color:var(--muted);font-size:13.5px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:3px 11px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.warn{background:var(--warn-bg);color:var(--warn)}.pill.bad{background:var(--bad-bg);color:var(--bad)}.pill.info{background:var(--info-bg);color:var(--info)}.pill.mute{background:var(--mute-bg);color:var(--muted)}
+.chip{display:inline-block;padding:2px 10px;border-radius:2px;background:var(--wash);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+
+/* ---------- panels & tables ---------- */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg)}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 24px;border-bottom:1px solid var(--line-2)}
+.panel-h h2,.panel-h h3{font-size:25px;color:var(--pine)}
+.panel-b{padding:24px}
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:14.5px}
+.tbl th{text-align:left;font-size:13.5px;font-weight:600;color:var(--muted);padding:13px 24px;background:var(--wash);border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:16px 24px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:var(--wash)}
+.tbl .r{text-align:right}.tbl .row{flex-wrap:nowrap}.tbl .code{font-weight:600;color:var(--pine);white-space:nowrap}
+.tbl .num{white-space:nowrap}
+.empty{padding:52px 24px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--pine);font:600 24px var(--display);margin-bottom:4px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row.end{justify-content:flex-end}
+.stack{display:flex;flex-direction:column;gap:20px}
+.cols{display:grid;gap:24px}.c2{grid-template-columns:repeat(2,minmax(0,1fr))}.c3{grid-template-columns:repeat(3,minmax(0,1fr))}.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.kpi{padding:22px 24px;border-top:3px solid var(--brass)}
+.kpi small{color:var(--muted);font-size:14px}
+.kpi b{display:block;font:600 42px/1.1 var(--display);color:var(--pine);margin:6px 0 4px}
+.kpi span{font-size:13.5px;color:var(--muted)}.kpi .up{color:var(--ok);font-weight:600}
+.sec-h{font-size:30px;color:var(--pine)}
+
+/* ---------- customer: hero & room cards ---------- */
+.hero{border-radius:var(--r-lg);color:#fff;position:relative;overflow:hidden;padding:60px 52px 124px;min-height:380px;background:linear-gradient(115deg,#0b231d 0%,#12342c 58%,#1b473d 100%)}
+.hero .art{position:absolute;right:0;top:0;height:100%;width:54%;pointer-events:none}
+.hero h2{font-size:60px;line-height:1.02;max-width:13ch;position:relative;z-index:1;color:#fff;font-weight:600}
+.hero p{max-width:42ch;margin-top:18px;color:#cddad4;font-size:17px;position:relative;z-index:1}
+.searchbar{position:relative;z-index:2;margin:-72px 40px 0;background:#fff;border:1px solid var(--line);border-top:3px solid var(--brass);border-radius:var(--r-lg);padding:22px 24px;display:grid;grid-template-columns:1.1fr 1.1fr .65fr .65fr 1.2fr auto;gap:16px;align-items:end;box-shadow:0 18px 40px -26px rgba(12,36,30,.6)}
+.results-h{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:44px 0 20px}
+.results-h h3{font-size:32px;color:var(--pine)}
+.rooms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.room{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,box-shadow .2s}
+.room:hover{border-color:var(--brass);box-shadow:0 18px 36px -28px rgba(12,36,30,.7)}
+.photo{height:210px;position:relative;overflow:hidden;background:#e7e2d6}
+.photo svg.rm{position:absolute;inset:0;width:100%;height:100%;display:block}
+.photo .tag{position:absolute;left:14px;top:14px;background:#fff;color:var(--pine);font-size:13px;font-weight:600;padding:3px 12px;border-radius:2px;z-index:1}
+.photo .tag.low{background:var(--gold);color:var(--pine-d)}
+.room-b{padding:22px 24px 24px;display:flex;flex-direction:column;gap:14px;flex:1}
+.room h4{font-size:29px;color:var(--pine)}
+.meta{display:flex;gap:16px;color:var(--muted);font-size:14px;flex-wrap:wrap}
+.meta span{display:inline-flex;gap:7px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.price-row{margin-top:auto;padding-top:18px;border-top:1px solid var(--line-2);display:flex;flex-direction:column;gap:16px}
+.price-row small{display:block;color:var(--muted);font-size:13.5px}
+.price-row b{display:block;font:600 34px/1.1 var(--display);color:var(--pine);white-space:nowrap}
+.price-row em{display:block;font-style:normal;color:var(--muted);font-size:13.5px}
+.price-row .row{flex-wrap:nowrap}.price-row .row .btn{flex:1}
+
+/* ---------- misc ---------- */
+.bars{display:grid;grid-template-columns:repeat(4,1fr);gap:36px;align-items:end;height:260px;padding:6px 12px 0;position:relative;background:repeating-linear-gradient(to top,transparent 0 64px,var(--line-2) 64px 65px)}
+.bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px}
+.bar i{display:block;width:100%;max-width:96px;border-top:3px solid var(--brass);background:var(--pine);transition:height .5s cubic-bezier(.2,.7,.2,1)}
+.bar b{font:600 22px var(--display);color:var(--pine)}.bar span{color:var(--muted);font-size:13.5px}
+.tabs{display:inline-flex;background:var(--mute-bg);padding:3px;border-radius:var(--r)}
+.tabs button{padding:6px 16px;border-radius:2px;font-weight:600;font-size:14px;color:var(--muted)}.tabs button.on{background:#fff;color:var(--pine);box-shadow:0 1px 2px rgba(12,36,30,.15)}
+.pay{display:flex;gap:12px;align-items:center;padding:13px 15px;border:1px solid var(--line);border-radius:var(--r);cursor:pointer}
+.pay:has(input:checked){border-color:var(--pine);background:var(--pine-l)}
+.pay input{accent-color:var(--pine)}
+.sum{border:1px solid var(--line);border-radius:var(--r)}
+.sum div{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line-2)}
+.sum div:last-child{border-bottom:0}.sum .t{background:var(--wash);font-weight:700}.sum .t b{font:600 24px var(--display);color:var(--pine)}
+.pend{display:flex;gap:16px;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--line-2)}
+.pend:last-child{border-bottom:0}
+.pend b{font-weight:600}.pend small{display:block;color:var(--muted);font-size:14px}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.flow .st{padding:6px 12px;background:#fff;border:1px solid var(--line);border-radius:2px;font-size:14px}
+.flow .ar{color:var(--brass)}
+.mock{text-align:left;padding:18px;border:1px solid var(--line);border-radius:var(--r-lg);background:#fff;display:flex;gap:14px;align-items:center;transition:border-color .15s,background .15s}
+.mock:hover{border-color:var(--brass);background:var(--wash)}
+.mock .bx{width:42px;height:42px;border-radius:50%;background:var(--brass-l);color:var(--brass-d);display:grid;place-items:center;flex:none}
+.mock b{display:block;font-size:15px}.mock small{color:var(--muted);font-size:13.5px}
+
+/* ---------- modal & toast ---------- */
+.backdrop{position:fixed;inset:0;background:rgba(9,26,22,.6);display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px;overflow-y:auto;z-index:60;animation:fade .15s}
+.dialog{background:#fff;border-radius:var(--r-lg);width:100%;max-width:500px;box-shadow:0 30px 70px -20px rgba(9,26,22,.65);animation:pop .18s cubic-bezier(.2,.8,.3,1)}
+.dialog.wide{max-width:700px}
+.dlg-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 26px;border-bottom:1px solid var(--line-2)}
+.dlg-h h3{font-size:29px;color:var(--pine)}
+.dlg-b{padding:24px 26px;display:flex;flex-direction:column;gap:18px}
+.dlg-f{display:flex;gap:10px;justify-content:flex-end;align-items:center;padding:16px 26px;border-top:1px solid var(--line-2);background:var(--wash);border-radius:0 0 var(--r-lg) var(--r-lg)}
+.dialog .photo{height:250px}
+#toasts{position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:10px;z-index:80}
+.toast{display:flex;gap:12px;align-items:flex-start;background:var(--pine-d);color:#fff;border-radius:var(--r);padding:14px 18px;min-width:300px;max-width:400px;box-shadow:0 14px 30px -12px rgba(9,26,22,.7);animation:pop .2s;border-left:4px solid #5fbf93}
+.toast.bad{border-left-color:#e77d8e}.toast.info{border-left-color:var(--gold)}
+.toast small{display:block;color:#b7c8c1;font-size:13.5px}
+@keyframes fade{from{opacity:0}}@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.985)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- responsive ---------- */
+@media (max-width:1100px){.rooms,.c3{grid-template-columns:repeat(2,minmax(0,1fr))}.c4{grid-template-columns:repeat(2,minmax(0,1fr))}.searchbar{grid-template-columns:1fr 1fr;margin:-72px 24px 0}.searchbar .btn{grid-column:1/-1}.hero .art{opacity:.55}}
+@media (max-width:900px){
+  .wrap,main{padding-left:20px;padding-right:20px}
+  .site .wrap{flex-wrap:wrap;gap:0 16px;min-height:0;padding-top:14px}
+  .brand{order:1;margin-right:auto}.who{order:2}
+  .nav{order:3;flex:0 0 100%;overflow-x:auto;margin-top:10px;gap:24px}.nav button{padding:12px 2px}
+  .c2{grid-template-columns:1fr}.ph{padding:30px 0 20px}.ph h1{font-size:38px}
+}
+@media (max-width:640px){
+  .util .lbl{display:none}.seg button{padding:4px 10px}
+  .brand b{font-size:25px}.who div{display:none}.who .btn{white-space:nowrap;padding:6px 10px}
+  .rooms,.c3,.c4{grid-template-columns:1fr}
+  .hero{padding:34px 24px 108px}.hero h2{font-size:44px}.hero .art{display:none}
+  .searchbar{grid-template-columns:1fr;margin:-76px 12px 0}
+  #toasts{left:16px;right:16px}.toast{min-width:0;max-width:none}
+  .pend{flex-direction:column;align-items:flex-start}
+  .results-h{flex-direction:column;align-items:flex-start}.results-h h3{font-size:28px}
+}
+
+/* ---------- v3 additions ---------- */
+.alert{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:var(--r);font-size:14px;border:1px solid;line-height:1.45}
+.alert .ic{margin-top:2px}
+.alert.bad{background:var(--bad-bg);border-color:#e6bcc3;color:#7d1f2c}
+.alert.warn{background:var(--warn-bg);border-color:#e6d19a;color:var(--warn)}
+.alert.info{background:var(--info-bg);border-color:#bfd2df;color:var(--info)}
+.field>.err{color:var(--bad);font-weight:500;font-size:13px;min-height:0}
+.field>.err:empty{display:none}
+.input.bad,.input[aria-invalid="true"]{border-color:var(--bad);background:#fffafa}
+.input.bad:focus{box-shadow:0 0 0 3px rgba(154,44,58,.2)}
+.room.off .photo svg{filter:grayscale(.6) opacity(.85)}
+.room.off h4{color:var(--muted)}
+.filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:24px}
+.steps{display:flex;gap:0;list-style:none;counter-reset:s;border-bottom:1px solid var(--line-2);margin:-4px 0 2px}
+.steps li{flex:1;counter-increment:s;padding:0 0 12px;font-size:13.5px;font-weight:600;color:var(--faint);position:relative;display:flex;align-items:center;gap:8px}
+.steps li::before{content:counter(s);width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:grid;place-items:center;font-size:12px}
+.steps li.on{color:var(--pine)}.steps li.on::after{content:"";position:absolute;left:0;right:12px;bottom:-1px;height:3px;background:var(--brass)}
+.steps li.done{color:var(--ok)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;cursor:pointer}
+.check input{accent-color:var(--pine);width:17px;height:17px;margin-top:2px;flex:none}
+fieldset.opts{border:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+fieldset.opts legend{font-size:13.5px;font-weight:600;margin-bottom:8px;padding:0}
+.done{display:flex;gap:14px;align-items:center;padding:14px 16px;background:var(--ok-bg);border-radius:var(--r);color:var(--ok)}
+.done b{color:var(--ink);font-size:17px}
+.mail{border:1px solid var(--line);border-radius:var(--r);padding:18px;background:var(--wash)}
+.mail hr{border:0;border-top:1px solid var(--line);margin:12px 0}.mail p{margin:8px 0}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 24px;border-top:1px solid var(--line-2)}
+.linkbtn{text-align:left;color:var(--pine);font-weight:600;font-size:14px;text-decoration:underline;text-underline-offset:3px;align-self:flex-start}
+.demo{background:var(--wash);border:1px dashed #cfc9b8;border-radius:var(--r);padding:10px 12px;font-size:13px}
+tr.hl td{background:var(--brass-l)}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.rcell{background:#fff;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.rcell.ok{border-left-color:var(--ok)}.rcell.info{border-left-color:var(--info)}.rcell.warn{border-left-color:#c8952f}.rcell.bad{border-left-color:var(--bad)}
+.rcell .rn{font:600 28px/1 var(--display);color:var(--pine)}.rcell .btn{align-self:flex-start;margin-top:6px}
+.dlg-f{flex-wrap:wrap}
+@media print{.util,.site,.foot,#toasts,.dlg-f,.icon-btn,.ph .btn{display:none!important}body{background:#fff}.backdrop{position:static;background:none;padding:0}.dialog{box-shadow:none;max-width:none;border:0}main{padding:0}}
+@media (max-width:1100px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.filters{grid-template-columns:1fr}.steps li{font-size:12.5px}.pager{flex-direction:column;align-items:flex-start}}
+
+/* ---------- validation, alerts, details ---------- */
+.field .e{font-style:normal;color:var(--bad);font-size:13px;min-height:0;line-height:1.35}
+.field .e:empty{display:none}
+.input.bad,.input[aria-invalid=true]{border-color:var(--bad);background:#fffafa}
+.input.bad:focus{box-shadow:0 0 0 3px rgba(154,44,58,.22)}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:var(--r);font-size:14px;line-height:1.45;border:1px solid}
+.alert .ic{margin-top:2px}
+.alert.bad{background:var(--bad-bg);border-color:#e6bcc3;color:#7f2330}
+.alert.warn{background:var(--warn-bg);border-color:#e8d3a2;color:var(--warn)}
+.alert.ok{background:var(--ok-bg);border-color:#b9d6c5;color:var(--ok)}
+.alert.info{background:var(--info-bg);border-color:#bfd2df;color:var(--info)}
+.alerts{display:flex;flex-direction:column;gap:8px}.alerts:empty{display:none}
+.room.off .photo svg.rm{filter:saturate(.55)}
+.room .alert{font-size:13.5px}
+.btn.lg[disabled]{cursor:not-allowed}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:9px 16px;font-size:14.5px}
+.kv dt{color:var(--muted)}.kv dd{font-weight:500;min-width:0;overflow-wrap:anywhere}
+.big-code{font:600 38px/1.1 var(--display);color:var(--pine);letter-spacing:.01em}
+.okmark{width:48px;height:48px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center}
+.okmark .ic{width:26px;height:26px;stroke-width:2}
+.fresh td{animation:flash 2.4s ease-out}
+@keyframes flash{0%,35%{background:var(--brass-l)}100%{background:transparent}}
+.sub{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+.sub.warnt{color:var(--warn)}
+.cols.g2{grid-template-columns:1fr 1fr;gap:14px}.cols.g3{grid-template-columns:repeat(3,1fr);gap:14px}
+.filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.filters .input{width:auto;height:38px;font-size:14px}
+.sec-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:34px 0 14px;flex-wrap:wrap}
+.sec-row .sec-h{margin:0}
+.mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:18px 24px}
+.rm-tile{border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:#fff}
+.rm-tile b{font:600 22px var(--display);color:var(--pine)}.rm-tile small{color:var(--muted);font-size:12.5px}
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.demo{background:var(--brass-l);border:1px dashed var(--brass);border-radius:var(--r);padding:10px 14px;font-size:13.5px;color:var(--brass-d)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}.check input{accent-color:var(--pine);width:17px;height:17px;margin-top:2px}
+.seg-tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:0}
+.t-note{font-size:13px;color:var(--muted)}
+.link{color:var(--pine);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+@media (max-width:900px){.kv{grid-template-columns:120px 1fr}.cols.g3{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.cols.g2,.cols.g3{grid-template-columns:1fr}.kv{grid-template-columns:1fr;gap:2px 0}.kv dd{margin-bottom:8px}}
+
+/* ---------- v4: booking rules, confirmation, timeline ---------- */
+.alert{border-left-width:4px;margin:0 0 20px}.dlg-b .alert{margin:0}
+.searchbar{grid-template-columns:1.15fr 1.15fr .7fr .7fr 1.25fr auto}
+.searchbar .err{grid-column:1/-1;min-height:22px}.searchbar .err:empty{display:none}
+.btn:disabled{opacity:.45;cursor:not-allowed}.btn:disabled:hover{background:inherit}
+.err:empty{display:none}
+.room .err{font-size:13.5px;align-items:flex-start;background:var(--bad-bg);padding:8px 10px;border-radius:var(--r)}
+.photo.sold svg.rm{filter:grayscale(.85) opacity(.7)}.photo .tag.out{background:var(--ink);color:#fff}
+.price-row em.dep{margin-top:6px;color:var(--ink)}.price-row em.dep b{display:inline;font:700 14.5px var(--body);color:var(--brass-d);white-space:nowrap}
+.tl{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tl li{position:relative;padding-top:20px;font-size:13px;color:var(--faint);font-weight:500}
+.tl li::before{content:"";position:absolute;left:0;right:0;top:6px;height:3px;background:var(--line)}
+.tl li.on{color:var(--pine);font-weight:600}.tl li.on::before{background:var(--brass)}
+.okmark{width:56px;height:56px;border-radius:50%;border:2px solid var(--brass);color:var(--pine);background:var(--brass-l);display:grid;place-items:center;margin:0 auto}
+.bigcode{font:600 40px/1.1 var(--display);color:var(--pine);margin:4px 0 12px;letter-spacing:.01em}
+.next{padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:14.5px}
+tr.flash td{animation:flash 2.4s ease-out}
+@keyframes flash{0%,40%{background:var(--brass-l)}100%{background:transparent}}
+@media (max-width:1100px){.searchbar{grid-template-columns:1fr 1fr}.searchbar .btn{grid-column:1/-1}}
+@media (max-width:640px){.tl{grid-template-columns:1fr 1fr}.bigcode{font-size:30px}.searchbar{grid-template-columns:1fr}}
+.tbl th,.tbl td{padding-left:18px;padding-right:18px}.tbl th:first-child,.tbl td:first-child{padding-left:24px}.tbl th:last-child,.tbl td:last-child{padding-right:24px}#bk-table td:nth-child(2){min-width:150px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></symbol>
+<symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18V6M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></symbol>
+<symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+<symbol id="i-guests" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2.2.6 3.5 2.2 3.5 5.2"/></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-login" viewBox="0 0 24 24"><path d="M14 4h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-5"/><path d="M10 8l4 4-4 4M14 12H4"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="M8 16v-5M12 16V8M16 16v-3"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h12v4"/><rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="16.5" cy="13.5" r="1.2"/></symbol>
+<symbol id="i-cash" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.8"/></symbol>
+<symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3"/><rect x="7" y="14" width="10" height="7"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7.5 11 12 15.5 16.5 11M4 20h16"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M5 17h14l-1.5-2V10a5.5 5.5 0 0 0-11 0v5z"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+<symbol id="i-door" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v17M3 21h18"/><circle cx="12.5" cy="12" r=".9"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l2 2M14 9l2 2"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.01"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></symbol>
+<symbol id="i-hotel" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h2M14 7h2M8 11h2M14 11h2"/></symbol>
+</defs></svg>
+
+<div class="util"><div class="wrap">
+  <span class="lbl" id="role-l">Prototype view</span>
+  <div class="seg" role="group" aria-labelledby="role-l" id="seg"></div>
+  <button class="ulink" id="maplink" data-act="docs">Screen map</button>
+</div></div>
+<header class="site"><div class="wrap">
+  <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 36V19a14 14 0 0 1 28 0v17" fill="none" stroke="#b8935a" stroke-width="2"/><path d="M12 36V20a8 8 0 0 1 16 0v16" fill="none" stroke="#14372f" stroke-width="2"/><path d="M3 28h34" stroke="#b8935a" stroke-width="2"/><circle cx="20" cy="22" r="3.6" fill="#b8935a"/></svg><b>Grand Horizon</b></div>
+  <nav class="nav" id="nav" aria-label="Pages"></nav>
+  <div class="who" id="who"></div>
+</div></header>
+<main id="view" tabindex="-1">
+  <div class="ph" id="ph"><h1 id="pt"></h1><p id="ps"></p></div>
+  <div id="pg"></div>
+</main>
+<footer class="foot"><div class="wrap"><span>Grand Horizon Hotel, booking system interface prototype</span><span>Software Engineering, Group 7</span></div></footer>
+<div id="modal-root"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<noscript><p style="padding:24px">This prototype needs JavaScript.</p></noscript>
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=n=>Math.round(n).toLocaleString('en-US'),fmt=n=>num(n)+' VND';
+const dmy=d=>d.split('-').reverse().join('/');
+const nights=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
+const deposit=t=>Math.round(t*.3/1000)*1000;
+const TODAY='2026-10-30',NOW=new Date('2026-10-30T12:00:00');
+const pad=(n,l=2)=>String(n).padStart(l,'0');
+const addDays=(d,n)=>new Date(new Date(d+'T00:00:00Z').getTime()+n*864e5).toISOString().slice(0,10);
+const clock=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())};
+const ic=(n,c='')=>`<svg class="ic ${c}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const EM='an.nguyen@example.com';
+
+/* ---------------- data ---------------- */
+const TYPES=[
+ {id:'dlx',name:'Deluxe Ocean Suite',bed:'1 king bed',cap:2,area:45,rate:1200000,left:2,am:['Free Wi-Fi','Ocean view','Breakfast included'],desc:'A corner suite with an arched window onto the sea, a soaking tub and a small work desk.'},
+ {id:'std',name:'Standard King Room',bed:'1 double bed',cap:2,area:30,rate:750000,left:5,am:['Free Wi-Fi','City view'],desc:'A quiet room on a higher floor with a city skyline view, a double bed and a rain shower.'},
+ {id:'exe',name:'Executive Family Suite',bed:'2 queen beds',cap:4,area:65,rate:1900000,left:1,am:['Private balcony','Jacuzzi bathtub','Free Wi-Fi'],desc:'Two queen beds, a private balcony and a jacuzzi bathtub, planned for a family of up to four.'}];
+const T=id=>TYPES.find(t=>t.id===id)||{id,name:'Room type',rate:0,cap:2,am:[],bed:'',area:0,desc:''};
+const S={
+ role:'customer',page:'search',invSeq:7,user:null,after:null,flash:null,bfilter:'all',period:'this',
+ accounts:[{email:EM,pw:'12345678',name:'Nguyen Van An',phone:'0901 234 567'}],resetEmail:'',
+ search:{ci:'2026-11-01',co:'2026-11-03',adults:2,children:0,type:'any',sort:'asc',price:'any'},
+ services:[{n:'Laundry (per item)',p:50000},{n:'Minibar',p:80000},{n:'Airport transfer',p:300000},{n:'Spa treatment',p:450000}],
+ staff:[{n:'Le Minh Chau',e:'chau.le@grandhorizon.example',r:'Receptionist',on:true},{n:'Tran Quoc Bao',e:'bao.tran@grandhorizon.example',r:'Admin',on:true,me:true},{n:'Pham Gia Han',e:'han.pham@grandhorizon.example',r:'Receptionist',on:false}],
+ mine:[
+  {code:'HB-20261101-0012',owner:EM,type:'dlx',ci:'2026-11-01',co:'2026-11-03',adults:2,children:0,note:'',total:2400000,dep:0,status:'unpaid',made:'30/10 09:12',hold:'31/10 09:12'},
+  {code:'HB-20260915-0045',owner:EM,type:'std',ci:'2026-09-15',co:'2026-09-17',adults:2,children:0,note:'',total:1500000,dep:450000,status:'completed',inv:'INV-20260917-0031',made:'12/09 15:40'}],
+ pending:[
+  {code:'HB-20261101-0012',guest:'Nguyen Van An',phone:'0901 234 567',type:'dlx',ci:'2026-11-01',co:'2026-11-03',dep:720000,paid:false,at:'30/10 09:12'},
+  {code:'HB-20261030-0013',guest:'Pham Thu Ha',phone:'0938 112 233',type:'std',ci:'2026-11-05',co:'2026-11-07',dep:450000,paid:true,at:'30/10 10:40'},
+  {code:'HB-20261030-0014',guest:'Vo Hoang Nam',phone:'0977 654 321',type:'exe',ci:'2026-11-08',co:'2026-11-11',dep:1710000,paid:false,at:'30/10 11:05'}],
+ arrivals:[
+  {code:'HB-20261029-0009',guest:'Tran Minh Khoa',phone:'0912 345 678',type:'dlx',ci:'2026-10-30',co:'2026-11-01',dep:720000},
+  {code:'HB-20261028-0004',guest:'Le Thi Mai',phone:'0983 777 120',type:'std',ci:'2026-10-30',co:'2026-11-02',dep:675000},
+  {code:'HB-20261027-0002',guest:'Do Quang Huy',phone:'0905 411 902',type:'exe',ci:'2026-10-30',co:'2026-11-01',dep:1140000},
+  {code:'HB-20261029-0011',guest:'Bui Thanh Tam',phone:'0944 018 556',type:'std',ci:'2026-10-30',co:'2026-10-31',dep:225000}],
+ inhouse:[
+  {room:'205',code:'HB-20261028-0006',guest:'Nguyen Thi Lan',type:'dlx',ci:'2026-10-28',co:'2026-10-30',dep:720000,svc:[{n:'Laundry (per item)',q:2,p:50000}]},
+  {room:'501',code:'HB-20261029-0008',guest:'Hoang Van Phuc',type:'exe',ci:'2026-10-29',co:'2026-10-31',dep:1140000,svc:[]}],
+ rooms:[{n:'101',t:'std',f:1,s:'Available'},{n:'102',t:'std',f:1,s:'Available'},{n:'103',t:'std',f:1,s:'Cleaning'},{n:'205',t:'dlx',f:2,s:'Occupied'},{n:'302',t:'dlx',f:3,s:'Available'},{n:'305',t:'dlx',f:3,s:'Maintenance'},{n:'401',t:'exe',f:4,s:'Available'}],
+ metric:'rev',actor:'All',auth:'login'};
+
+/* ---------------- rules and helpers ---------------- */
+const guests=q=>q.adults+q.children;
+const ACTIVE=['unpaid','paid','confirmed'];
+function dateErr(q){
+ if(!q.ci||!q.co)return 'Choose both a check-in and a check-out date.';
+ if(q.ci<TODAY)return 'Check-in cannot be in the past.';
+ const n=nights(q.ci,q.co);
+ if(!(n>0))return 'Check-out must be after check-in.';
+ if(n>30)return 'A stay is limited to 30 nights. Shorten it or make a second booking.';
+ return ''}
+const capErr=(t,q)=>guests(q)>t.cap?`${t.name} sleeps up to ${t.cap} guests, but you selected ${guests(q)}.`:'';
+const roomsLeft=(t,q,skip)=>t.left-S.mine.filter(b=>b.fresh&&b.code!==skip&&b.type===t.id&&ACTIVE.includes(b.status)&&b.ci<q.co&&b.co>q.ci).length;
+const allCodes=()=>[...S.mine,...S.pending,...S.arrivals,...S.inhouse].map(x=>x.code);
+const newCode=ci=>{let c;do{c=`HB-${ci.replace(/-/g,'')}-${pad(1000+Math.floor(Math.random()*9000),4)}`}while(allCodes().includes(c));return c};
+const hoursTo=b=>(new Date(b.ci+'T14:00:00')-NOW)/36e5;
+const myBookings=()=>S.user?S.mine.filter(b=>b.owner===S.user.email):[];
+const dayShort=d=>d.split('-').reverse().slice(0,2).join('/');
+
+/* ---------------- illustrations ---------------- */
+const HERO=`<svg class="art" viewBox="0 0 520 380" preserveAspectRatio="xMaxYMid slice" aria-hidden="true"><defs>
+<linearGradient id="hk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6e2b9"/><stop offset=".62" stop-color="#eeb27a"/><stop offset="1" stop-color="#d98a62"/></linearGradient>
+<linearGradient id="hs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e6f6a"/><stop offset="1" stop-color="#0f3a37"/></linearGradient>
+<clipPath id="hc"><path d="M40 380V150a70 70 0 0 1 140 0v230Z"/><path d="M200 380V110a70 70 0 0 1 140 0v270Z"/><path d="M360 380V190a70 70 0 0 1 140 0v190Z"/></clipPath></defs>
+<g clip-path="url(#hc)"><rect width="520" height="380" fill="url(#hk)"/><circle cx="270" cy="236" r="40" fill="#fbf0d4"/><rect y="236" width="520" height="150" fill="url(#hs)"/>
+<g stroke="#f3d79c" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"><path d="M236 252h68M246 264h48M256 276h28M60 258h90M390 262h80M410 276h44"/></g></g>
+<g fill="none" stroke="#b8935a" stroke-width="1.6"><path d="M40 380V150a70 70 0 0 1 140 0v230M200 380V110a70 70 0 0 1 140 0v270M360 380V190a70 70 0 0 1 140 0v190"/></g></svg>`;
+const ART={
+ dlx:{wall:'#e9e3d5',floor:'#cfc4ad',bed:'#14372f',beds:[[96,288]],tables:[[40],[398]],view:`<defs><linearGradient id="a1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6e2b9"/><stop offset="1" stop-color="#eeb27a"/></linearGradient></defs><rect x="160" y="20" width="160" height="140" fill="url(#a1)"/><circle cx="240" cy="108" r="22" fill="#fbf0d4"/><rect x="160" y="108" width="160" height="60" fill="#2e6f6a"/><path d="M190 120h60M210 130h40M232 140h60" stroke="#f3d79c" stroke-opacity=".6" stroke-width="2"/>`},
+ std:{wall:'#e4e6df',floor:'#c9c3b0',bed:'#7a6338',beds:[[120,240]],tables:[[64],[374]],view:`<rect x="160" y="20" width="160" height="140" fill="#d8e2dd"/><g fill="#6f8a84"><rect x="168" y="96" width="26" height="64"/><rect x="198" y="72" width="30" height="88"/><rect x="232" y="104" width="22" height="56"/><rect x="258" y="84" width="28" height="76"/><rect x="290" y="110" width="26" height="50"/></g><g fill="#f3e6c4"><rect x="204" y="82" width="5" height="6"/><rect x="214" y="96" width="5" height="6"/><rect x="264" y="94" width="5" height="6"/><rect x="204" y="110" width="5" height="6"/></g>`},
+ exe:{wall:'#e6e0d1',floor:'#cbbfa6',bed:'#2f5b6b',beds:[[56,172],[252,172]],tables:[[222]],view:`<rect x="160" y="20" width="160" height="140" fill="#d5e3df"/><path d="M160 112c30-26 50-26 80-6s56 6 80-12v66H160Z" fill="#7da08d"/><path d="M160 134c40-20 70-14 100 0s40 4 60-8v34H160Z" fill="#3f7360"/><g stroke="#fff" stroke-width="2.5"><path d="M160 130h160M174 130v30M200 130v30M226 130v30M252 130v30M278 130v30M304 130v30"/></g>`}};
+const art=id=>{const A=ART[id]||ART.std;
+ const bed=([x,w])=>`<rect x="${x}" y="150" width="${w}" height="100" rx="5" fill="#7b5d3b"/><rect x="${x+10}" y="168" width="${(w-30)/2}" height="36" rx="12" fill="#fff"/><rect x="${x+20+(w-30)/2}" y="168" width="${(w-30)/2}" height="36" rx="12" fill="#f7f3ea"/><rect x="${x-12}" y="198" width="${w+24}" height="54" rx="8" fill="#f4f0e6"/><rect x="${x-12}" y="216" width="${w+24}" height="38" rx="6" fill="${A.bed}"/><rect x="${x-12}" y="224" width="${w+24}" height="4" fill="#b8935a"/>`;
+ const tab=([x])=>`<rect x="${x}" y="200" width="42" height="46" rx="3" fill="#7b5d3b"/><path d="M${x+8} 192l5-26h16l5 26Z" fill="#f3ead8" stroke="#b8935a" stroke-width="1.5"/><path d="M${x+21} 192v8" stroke="#b8935a" stroke-width="2"/>`;
+ return `<svg class="rm" viewBox="0 0 480 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustration of the ${esc(T(id).name)}"><rect width="480" height="300" fill="${A.wall}"/><rect y="238" width="480" height="62" fill="${A.floor}"/><rect y="236" width="480" height="3" fill="#b8935a"/>
+ <clipPath id="w-${id}"><path d="M160 168V90a80 80 0 0 1 160 0v78Z"/></clipPath><g clip-path="url(#w-${id})">${A.view}</g><path d="M160 168V90a80 80 0 0 1 160 0v78Z" fill="none" stroke="#fbfaf5" stroke-width="5"/><path d="M240 10v158" stroke="#fbfaf5" stroke-width="3" opacity=".7"/>
+ <rect x="122" y="30" width="30" height="142" fill="#d8cfb9"/><rect x="328" y="30" width="30" height="142" fill="#d8cfb9"/><g stroke="#c3b89d" stroke-width="2"><path d="M130 30v142M138 30v142M146 30v142M336 30v142M344 30v142M352 30v142"/></g>
+ ${A.beds.map(bed).join('')}${A.tables.map(tab).join('')}</svg>`};
+
+/* ---------------- navigation ---------------- */
+const NAV={
+ customer:[['search','Find a room'],['bookings','My bookings'],['profile','Profile']],
+ desk:[['overview','Front desk'],['checkin','Check-in'],['inhouse','In-house and check-out']],
+ admin:[['dash','Reports'],['rooms','Rooms'],['types','Room types and prices'],['services','Add-on services'],['staff','Staff accounts']]};
+const ROLE_L={customer:'Customer',desk:'Front desk',admin:'Admin'};
+const TITLES={
+ 'customer.search':['Find a room','Check availability and book your stay'],'customer.bookings':['My bookings','Track, pay for, change or cancel your reservations'],'customer.profile':['My profile','Keep your contact details up to date'],
+ 'desk.overview':['Front desk','Confirm new bookings and watch today’s arrivals'],'desk.checkin':['Check-in','Verify the guest’s ID and assign a room'],'desk.inhouse':['In-house guests','Add services and check guests out'],
+ 'admin.dash':['Reports','Revenue and occupancy for the selected month'],'admin.rooms':['Rooms','Every room, its floor and its current status'],'admin.types':['Room types and prices','Capacity, size and the nightly rate guests are charged'],
+ 'admin.services':['Add-on services','Services the front desk can add to a guest’s bill'],'admin.staff':['Staff accounts','Who can sign in to the front desk and admin areas'],
+ 'docs.map':['Screen map','Every screen of the system with the requirements and use cases it covers']};
+function go(role,page){S.role=role;S.page=page||NAV[role]?.[0][0]||'map';render();scrollTo(0,0)}
+function userInfo(){const r=S.role;
+ if(r==='desk')return['Le Minh Chau','Receptionist'];if(r==='admin')return['Tran Quoc Bao','Admin'];
+ return S.user?[S.user.name,'Customer']:null}
+function render(){
+ const r=S.role,tk=r+'.'+S.page,[t,s]=TITLES[tk]||['',''];
+ $('#pt').textContent=t;$('#ps').textContent=s;$('#ph').classList.toggle('hide',tk==='customer.search');document.title=t+' – Grand Horizon Hotel';
+ $('#seg').innerHTML=Object.keys(ROLE_L).map(k=>`<button class="${k===r?'on':''}" data-act="role:${k}" aria-pressed="${k===r}">${ROLE_L[k]}</button>`).join('');
+ const items=r==='docs'?[]:NAV[r];
+ $('#nav').innerHTML=items.map(([p,l])=>`<button class="${p===S.page?'on':''}" data-act="page:${p}" ${p===S.page?'aria-current="page"':''}>${l}</button>`).join('');
+ $('#maplink').classList.toggle('on',r==='docs');
+ const u=userInfo();
+ $('#who').innerHTML=u?`<div class="avatar" aria-hidden="true">${u[0].split(' ').slice(-2).map(w=>w[0]).join('')}</div><div><b>${esc(u[0])}</b><small>${u[1]}</small></div>${r==='customer'?`<button class="btn ghost sm" data-act="signout">Sign out</button>`:''}`
+  :`<button class="btn ghost sm" data-act="auth:login">${ic('login','sm')}Sign in</button><button class="btn sm" data-act="auth:register">Register</button>`;
+ $('#pg').innerHTML=(PAGES[tk]||(()=>''))();
+ if(tk==='customer.search'){validate();results()}
+}
+
+/* ---------------- customer: search ---------------- */
+const STATUS={unpaid:['warn','Deposit due'],paid:['info','Awaiting confirmation'],confirmed:['ok','Confirmed'],completed:['mute','Completed'],cancelled:['bad','Cancelled'],rejected:['bad','Rejected by hotel']};
+const pill=s=>`<span class="pill ${STATUS[s][0]}">${STATUS[s][1]}</span>`;
+const opts=(a,b,v,fn=n=>n)=>Array.from({length:b-a+1},(_,i)=>a+i).map(n=>`<option value="${n}" ${n==v?'selected':''}>${fn(n)}</option>`).join('');
+function pSearch(){const q=S.search;return `
+<section class="hero">${HERO}<h2>Find a room that fits your stay</h2><p>Compare room types, see the total for your dates, and hold a room with a 30% deposit.</p></section>
+<form class="searchbar" data-form="search" novalidate>
+ <label class="field"><span>Check-in</span><input class="input" type="date" id="s-ci" min="${TODAY}" value="${q.ci}"></label>
+ <label class="field"><span>Check-out</span><input class="input" type="date" id="s-co" value="${q.co}"></label>
+ <label class="field"><span>Adults</span><select class="input" id="s-a">${opts(1,6,q.adults)}</select></label>
+ <label class="field"><span>Children</span><select class="input" id="s-c">${opts(0,4,q.children)}</select></label>
+ <label class="field"><span>Room type</span><select class="input" id="s-t"><option value="any">Any type</option>${TYPES.map(t=>`<option value="${t.id}" ${t.id===q.type?'selected':''}>${esc(t.name)}</option>`).join('')}</select></label>
+ <button class="btn sun lg" id="s-go">${ic('search')}Search</button>
+ <div class="err" id="s-err" role="alert"></div>
+</form>
+<div id="results"></div>`}
+function readSearch(){const q=S.search;q.ci=$('#s-ci').value;q.co=$('#s-co').value;q.adults=+$('#s-a').value;q.children=+$('#s-c').value;q.type=$('#s-t').value;validate();results()}
+function validate(){const q=S.search,e=dateErr(q),el=$('#s-err');if(!el)return;
+ el.innerHTML=e?ic('warn','sm')+e:'';
+ const bad=!!e;$('#s-ci').setAttribute('aria-invalid',bad&&(!q.ci||q.ci<TODAY||nights(q.ci,q.co)<=0));$('#s-co').setAttribute('aria-invalid',bad&&(!q.co||nights(q.ci,q.co)<=0||nights(q.ci,q.co)>30));
+ $('#s-go').disabled=bad}
+function results(){
+ const q=S.search,err=dateErr(q),box=$('#results');if(!box)return;
+ if(err){box.innerHTML=`<div class="panel empty" style="margin-top:44px"><b>Check your dates</b>${err}</div>`;return}
+ const n=nights(q.ci,q.co);
+ let list=TYPES.filter(t=>(q.type==='any'||t.id===q.type)&&(q.price==='any'||(q.price==='lo'?t.rate<1000000:t.rate>=1000000)));
+ list.sort((a,b)=>q.sort==='asc'?a.rate-b.rate:b.rate-a.rate);
+ const maxCap=Math.max(...TYPES.map(t=>t.cap));
+ let html=`<div class="results-h"><h3>${list.length} room type${list.length===1?'':'s'} for ${n} night${n>1?'s':''}, ${guests(q)} guest${guests(q)>1?'s':''}</h3>
+  <div class="row"><label class="row hint"><span>Price</span><select class="input" style="width:auto;height:38px" data-change="price"><option value="any" ${q.price==='any'?'selected':''}>Any</option><option value="lo" ${q.price==='lo'?'selected':''}>Under 1,000,000 VND</option><option value="hi" ${q.price==='hi'?'selected':''}>1,000,000 VND and up</option></select></label>
+  <label class="row hint"><span>Sort by</span><select class="input" style="width:auto;height:38px" data-change="sort"><option value="asc" ${q.sort==='asc'?'selected':''}>Price, low to high</option><option value="desc" ${q.sort==='desc'?'selected':''}>Price, high to low</option></select></label></div></div>`;
+ if(guests(q)>maxCap)html+=`<div class="alert bad" role="alert">${ic('warn')}<div><b>No single room sleeps ${guests(q)} guests</b>Our largest room sleeps ${maxCap}. Reduce the number of guests or make two separate bookings.</div></div>`;
+ html+=list.length?`<div class="rooms">${list.map(t=>roomCard(t,n)).join('')}</div>`:`<div class="panel empty"><b>No room matches these filters</b>Try “Any type” or a different price range.</div>`;
+ box.innerHTML=html;
+}
+const photo=(t,tag,sold)=>`<div class="photo ${sold?'sold':''}">${art(t.id)}${tag?`<span class="tag ${sold?'out':t.left<=2?'low':''}">${tag}</span>`:''}</div>`;
+function roomCard(t,n){const q=S.search,left=roomsLeft(t,q),ce=capErr(t,q),off=ce||left<=0,tot=t.rate*n;
+ return `<article class="room">${photo(t,left<=0?'Sold out':`${left} room${left>1?'s':''} left`,left<=0)}<div class="room-b"><h4>${esc(t.name)}</h4>
+ <div class="meta"><span>${ic('bed','sm')}${t.bed}</span><span>${ic('guests','sm')}Up to ${t.cap}</span><span>${ic('expand','sm')}${t.area} m²</span></div>
+ <div class="chips">${t.am.map(a=>`<span class="chip">${esc(a)}</span>`).join('')}</div>
+ ${ce?`<div class="err" role="alert">${ic('warn','sm')}<span>${ce}</span></div>`:''}${left<=0&&!ce?`<div class="err" role="alert">${ic('warn','sm')}<span>No rooms left for these dates. Try other dates.</span></div>`:''}
+ <div class="price-row"><div><small>Total for ${n} night${n>1?'s':''}</small><b>${fmt(tot)}</b><em>${fmt(t.rate)} per night</em><em class="dep">Deposit today (30%): <b>${fmt(deposit(tot))}</b></em></div>
+ <div class="row"><button class="btn ghost sm" data-act="detail:${t.id}">Details</button><button class="btn sm" data-act="book:${t.id}" ${off?'disabled':''} ${ce?`title="${esc(ce)}"`:''}>Book now</button></div></div></div></article>`}
+
+/* ---------------- customer: bookings and profile ---------------- */
+const needLogin=(what)=>`<div class="panel empty"><b>Sign in to see ${what}</b>Your bookings and details are kept with your account.<div class="row" style="justify-content:center;margin-top:18px"><button class="btn" data-act="auth:login">Sign in</button><button class="btn ghost" data-act="auth:register">Create an account</button></div></div>`;
+function pBookings(){if(!S.user)return needLogin('your bookings');
+ const F=[['all','All'],['active','Active'],['completed','Completed'],['cancelled','Cancelled']],f=S.bfilter;
+ const list=myBookings().filter(b=>f==='all'||(f==='active'&&ACTIVE.includes(b.status))||(f==='completed'&&b.status==='completed')||(f==='cancelled'&&['cancelled','rejected'].includes(b.status)));
+ return `<div class="row" style="justify-content:space-between;margin-bottom:16px"><div class="tabs" role="group" aria-label="Filter bookings">${F.map(([k,l])=>`<button class="${k===f?'on':''}" data-act="bfilter:${k}">${l}</button>`).join('')}</div><button class="btn" data-act="page:search">${ic('plus','sm')}New booking</button></div>
+ <div class="panel"><div class="tbl-wrap"><table class="tbl" id="bk-table"><thead><tr><th>Booking</th><th>Room type</th><th>Stay</th><th class="r">Total</th><th>Status</th><th class="r">Actions</th></tr></thead><tbody>
+ ${list.length?list.map(b=>{const n=nights(b.ci,b.co);return `<tr class="${S.flash===b.code?'flash':''}"><td><span class="code">${b.code}</span>${b.status==='unpaid'?`<div class="hint">Pay by ${b.hold}</div>`:''}</td><td>${esc(T(b.type).name)}</td><td class="num">${dmy(b.ci)} to ${dmy(b.co)}<div class="hint">${n} night${n>1?'s':''}, ${b.adults+b.children} guest${b.adults+b.children>1?'s':''}</div></td><td class="r num"><b>${fmt(b.total)}</b></td><td>${pill(b.status)}</td>
+ <td class="r"><div class="row end">${b.status==='unpaid'?`<button class="btn sm" data-act="pay:${b.code}">Pay deposit</button>`:''}${b.status==='completed'?`<button class="btn ghost sm" data-act="inv:${b.code}">Invoice</button>`:''}<button class="btn ghost sm" data-act="bdetail:${b.code}">Details</button></div></td></tr>`}).join(''):`<tr><td colspan="6"><div class="empty"><b>No bookings here yet</b>Find a room and your booking will appear in this list.</div></td></tr>`}
+ </tbody></table></div></div>
+ <p class="hint" style="margin-top:14px">A booking whose deposit is not paid within 24 hours is released automatically.</p>`}
+function pProfile(){if(!S.user)return needLogin('your profile');const u=S.user;return `<form class="panel" style="max-width:640px" data-form="profile"><div class="panel-h"><h2>Contact details</h2></div><div class="panel-b stack" style="gap:16px">
+ <label class="field"><span>Full name</span><input class="input" name="name" value="${esc(u.name)}" required></label>
+ <label class="field"><span>Email (used to sign in)</span><input class="input" value="${esc(u.email)}" readonly></label>
+ <label class="field"><span>Phone number</span><input class="input" name="phone" value="${esc(u.phone)}" required></label>
+ <div class="field"><span>Change password</span><input class="input" type="password" name="cur" placeholder="Current password" autocomplete="current-password"><input class="input" type="password" name="new" placeholder="New password, at least 8 characters" autocomplete="new-password"></div>
+ <div class="err" id="pf-err" role="alert"></div><div class="row"><button class="btn">Save changes</button><button type="button" class="btn ghost" data-act="signout">Sign out</button></div></div></form>`}
+
+/* ---------------- front desk ---------------- */
+const bill=(g,late)=>{const n=Math.max(1,nights(g.ci,g.co)),room=n*T(g.type).rate,svc=g.svc.reduce((a,s)=>a+s.q*s.p,0),lf=late?T(g.type).rate/2:0,sub=room+svc+lf,vat=Math.round(sub*.1),total=sub+vat;return{n,room,svc,lf,sub,vat,total,bal:total-g.dep}};
+function pOverview(){
+ const avail=S.rooms.filter(r=>r.s==='Available').length;
+ return `<div class="cols c4">${[['Pending confirmation',S.pending.length,'bookings to review'],['Arrivals today',S.arrivals.length,'waiting to check in'],['In-house guests',S.inhouse.length,'staying now'],['Rooms available',avail,'ready to sell']].map(k=>`<div class="panel kpi"><small>${k[0]}</small><b>${k[1]}</b><span>${k[2]}</span></div>`).join('')}</div>
+ <div class="row" style="margin:32px 0 14px;justify-content:space-between"><h3 class="sec-h">Pending bookings, oldest first</h3><button class="btn" data-act="walkin">${ic('plus','sm')}New walk-in booking</button></div>
+ <div class="panel">${S.pending.length?S.pending.map(p=>`<div class="pend"><div><b>${p.code}</b> &nbsp;${esc(p.guest)}<small>${esc(T(p.type).name)}, ${dmy(p.ci)} to ${dmy(p.co)}, deposit ${fmt(p.dep)}. Booked ${p.at}</small>
+  <div style="margin-top:6px">${p.paid?'<span class="pill ok">Deposit received</span>':'<span class="pill warn">Deposit not received</span>'}</div></div>
+  <div class="row"><button class="btn ok sm" data-act="confirm:${p.code}" ${p.paid?'':'disabled title="Confirm after the deposit is received"'}>${ic('check','sm')}Confirm</button><button class="btn bad sm" data-act="reject:${p.code}">Reject</button></div></div>`).join(''):`<div class="empty"><b>No bookings are waiting</b>New bookings from customers show up here.</div>`}</div>`}
+function arrRows(l){return l.length?l.map(a=>`<tr><td class="code">${a.code}</td><td><b>${esc(a.guest)}</b><div class="hint">${esc(a.phone)}</div></td><td>${esc(T(a.type).name)}</td><td class="num">${dmy(a.ci)} to ${dmy(a.co)}</td><td class="num">${a.dep?fmt(a.dep):'<span class="hint">None, walk-in</span>'}</td><td class="r"><button class="btn sm" data-act="checkin:${a.code}">Check in</button></td></tr>`).join(''):`<tr><td colspan="6"><div class="empty"><b>No arrivals match</b>Try a different code, name or phone number.</div></td></tr>`}
+function pCheckin(){return `<div class="panel"><div class="panel-h"><h2>Arrivals today</h2><label class="field" style="width:280px"><input class="input" id="arr-q" placeholder="Search by code, name or phone" data-input="arr" aria-label="Search arrivals"></label></div>
+ <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Booking</th><th>Guest</th><th>Room type</th><th>Stay</th><th>Deposit paid</th><th class="r"></th></tr></thead><tbody id="arr-b">${arrRows(S.arrivals)}</tbody></table></div></div>`}
+function pInhouse(){return `<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Room</th><th>Guest</th><th>Stay</th><th class="r">Services</th><th class="r">Balance now</th><th class="r"></th></tr></thead><tbody>
+ ${S.inhouse.length?S.inhouse.map(g=>{const b=bill(g,false);return `<tr><td class="code">${g.room}</td><td><b>${esc(g.guest)}</b><div class="hint">${g.code}, ${esc(T(g.type).name)}</div></td><td class="num">${dmy(g.ci)} to ${dmy(g.co)}</td><td class="r num">${fmt(b.svc)}</td><td class="r num"><b>${fmt(b.bal)}</b></td>
+ <td class="r"><div class="row end"><button class="btn ghost sm" data-act="svc:${g.code}">Add service</button><button class="btn sm" data-act="checkout:${g.code}">Check out</button></div></td></tr>`}).join(''):`<tr><td colspan="6"><div class="empty"><b>No guests are staying right now</b>Checked-in guests appear here.</div></td></tr>`}</tbody></table></div></div>`}
+
+/* ---------------- admin ---------------- */
+const REPORT={this:{rev:[31.2,36.4,44.6,36.3],occ:[76,82,90,82],by:{dlx:71.2,std:33.8,exe:43.5},label:'October 2026',note:'<span class="up">Up 12.4%</span> on September'},
+ last:{rev:[28.4,31.9,39.6,32.2],occ:[70,77,86,75],by:{dlx:62.0,std:30.4,exe:39.7},label:'September 2026',note:'Full month total'}};
+function pDash(){const R=REPORT[S.period],rev=S.metric==='rev',v=rev?R.rev:R.occ,mx=rev?50:100,tot=R.rev.reduce((a,b)=>a+b,0),occ=R.occ.reduce((a,b)=>a+b,0)/4;
+ const ids=Object.keys(R.by);
+ return `<div class="row" style="justify-content:space-between;margin-bottom:18px"><div class="tabs" role="group" aria-label="Month">${Object.entries(REPORT).map(([k,r])=>`<button class="${k===S.period?'on':''}" data-act="period:${k}">${r.label}</button>`).join('')}</div>
+  <div class="row"><button class="btn sm" data-act="export:Excel">${ic('download','sm')}Export Excel</button><button class="btn ghost sm" data-act="export:PDF">${ic('download','sm')}Export PDF</button></div></div>
+ <div class="cols c3"><div class="panel kpi"><small>Revenue (payments minus refunds)</small><b>${num(tot*1e6)} VND</b><span>${R.note}</span></div>
+ <div class="panel kpi"><small>Occupancy rate</small><b>${occ.toFixed(1)}%</b><span>Occupied room-nights over rooms in service × days</span></div>
+ <div class="panel kpi"><small>Refunds issued</small><b>${S.period==='this'?'3,450,000':'2,100,000'} VND</b><span>Cancelled and rejected bookings</span></div></div>
+ <div class="panel" style="margin-top:24px"><div class="panel-h"><h2>${rev?'Revenue':'Occupancy'} by week</h2><div class="tabs" role="group" aria-label="Metric"><button class="${rev?'on':''}" data-act="metric:rev">Revenue</button><button class="${rev?'':'on'}" data-act="metric:occ">Occupancy</button></div></div>
+ <div class="panel-b"><div class="bars">${v.map((x,i)=>`<div class="bar"><b>${rev?x.toFixed(1)+' M':x+'%'}</b><i style="height:${x/mx*80}%" title="Week ${i+1}"></i><span>Week ${i+1}</span></div>`).join('')}</div></div></div>
+ <div class="panel" style="margin-top:24px"><div class="panel-h"><h2>Revenue by room type</h2></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Room type</th><th class="r">Revenue</th><th class="r">Share</th></tr></thead><tbody>${ids.map(id=>`<tr><td><b>${esc(T(id).name)}</b></td><td class="r num">${num(R.by[id]*1e6)} VND</td><td class="r num">${(R.by[id]/tot*100).toFixed(1)}%</td></tr>`).join('')}</tbody></table></div></div>`}
+const RS={Available:'ok',Occupied:'info',Cleaning:'warn',Maintenance:'bad'};
+function pRooms(){return `<div class="panel"><div class="panel-h"><h2>${S.rooms.length} rooms</h2><button class="btn sm" data-act="addroom">${ic('plus','sm')}Add room</button></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Room</th><th>Type</th><th>Floor</th><th class="r">Nightly rate</th><th>Status</th><th class="r"></th></tr></thead><tbody>
+ ${S.rooms.map(r=>`<tr><td class="code">${r.n}</td><td>${esc(T(r.t).name)}</td><td>${r.f}</td><td class="r num">${fmt(T(r.t).rate)}</td><td><span class="pill ${RS[r.s]}">${r.s}</span></td><td class="r"><button class="btn ghost sm" data-act="editroom:${r.n}">${ic('edit','sm')}Edit</button></td></tr>`).join('')}</tbody></table></div></div>`}
+function pTypes(){return `<div class="panel"><div class="panel-h"><h2>${TYPES.length} room types</h2><button class="btn sm" data-act="addtype">${ic('plus','sm')}Add room type</button></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Room type</th><th>Bed</th><th>Sleeps</th><th>Size</th><th>Amenities</th><th class="r">Rate per night</th><th class="r">Rooms</th><th class="r"></th></tr></thead><tbody>
+ ${TYPES.map(t=>{const c=S.rooms.filter(r=>r.t===t.id).length;return `<tr><td><b>${esc(t.name)}</b></td><td>${esc(t.bed)}</td><td>${t.cap}</td><td class="num">${t.area} m²</td><td>${t.am.map(a=>`<span class="chip" style="margin:0 4px 4px 0">${esc(a)}</span>`).join('')}</td><td class="r num"><b>${fmt(t.rate)}</b></td><td class="r">${c}</td>
+ <td class="r"><div class="row end"><button class="btn ghost sm" data-act="edittype:${t.id}">${ic('edit','sm')}Edit</button><button class="btn bad sm" data-act="deltype:${t.id}" ${c?'disabled title="Move or remove its rooms first"':''}>Delete</button></div></td></tr>`}).join('')}</tbody></table></div></div>
+ <p class="hint" style="margin-top:14px">A new rate applies to new bookings only. Bookings already made keep the price they were booked at.</p>`}
+function pServices(){return `<div class="panel"><div class="panel-h"><h2>${S.services.length} services</h2><button class="btn sm" data-act="addsvc">${ic('plus','sm')}Add service</button></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Service</th><th class="r">Price</th><th class="r"></th></tr></thead><tbody>
+ ${S.services.map((s,i)=>`<tr><td><b>${esc(s.n)}</b></td><td class="r num">${fmt(s.p)}</td><td class="r"><div class="row end"><button class="btn ghost sm" data-act="editsvc:${i}">${ic('edit','sm')}Edit</button><button class="btn bad sm" data-act="delsvc:${i}">Remove</button></div></td></tr>`).join('')}</tbody></table></div></div>
+ <p class="hint" style="margin-top:14px">Services already on a guest’s bill keep the price they were added at.</p>`}
+function pStaff(){return `<div class="panel"><div class="panel-h"><h2>${S.staff.length} staff accounts</h2><button class="btn sm" data-act="addstaff">${ic('plus','sm')}Add staff account</button></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th class="r"></th></tr></thead><tbody>
+ ${S.staff.map((s,i)=>`<tr><td><b>${esc(s.n)}</b>${s.me?' <span class="hint">(you)</span>':''}</td><td>${esc(s.e)}</td><td>${s.r}</td><td><span class="pill ${s.on?'ok':'mute'}">${s.on?'Active':'Locked'}</span></td>
+ <td class="r"><div class="row end"><button class="btn ghost sm" data-act="resetstaff:${i}">Reset password</button><button class="btn ${s.on?'bad':'ghost'} sm" data-act="lockstaff:${i}" ${s.me?'disabled title="You cannot lock your own account"':''}>${s.on?'Lock':'Unlock'}</button></div></td></tr>`).join('')}</tbody></table></div></div>`}
+
+/* ---------------- screen map ---------------- */
+const MAP=[['Login','All roles','FR-02','UC-02'],['Register','Guest','FR-01','UC-01'],['Reset password','All roles','FR-03','UC-14'],['Customer profile','Customer','FR-04','UC-13'],
+['Home and room search','Guest, Customer','FR-06','UC-03'],['Search results and filters','Guest, Customer','FR-06, FR-07','UC-03'],['Room details','Guest, Customer','FR-08','UC-03'],
+['Booking form','Customer','FR-09, FR-10','UC-04'],['Payment','Customer','FR-20','UC-09'],['Booking confirmation','Customer','FR-30','UC-15'],['Booking history','Customer','FR-13','UC-04'],
+['Booking details, change and cancel','Customer','FR-11, FR-12','UC-04, UC-05'],['Front desk dashboard','Receptionist','FR-14, FR-16','UC-06, UC-07'],['Pending bookings','Receptionist','FR-14, FR-22','UC-06'],
+['Walk-in booking','Receptionist','FR-15','UC-16'],['Check-in and room assignment','Receptionist','FR-16, FR-17','UC-07'],['Extra services','Receptionist','FR-18','UC-08'],['Check-out and invoice','Receptionist','FR-19, FR-21','UC-08, UC-09'],
+['Admin dashboard','Admin','FR-27','UC-12'],['Staff accounts','Admin','FR-05','UC-17'],['Room types','Admin','FR-23','UC-10'],['Room management','Admin','FR-24','UC-10'],
+['Price list','Admin','FR-25','UC-11'],['Add-on services','Admin','FR-26','UC-10'],['Revenue report','Admin','FR-27','UC-12'],['Occupancy report and export','Admin','FR-28, FR-29','UC-12']];
+const FLOWS=[['Guest',['Home and room search','Search results and filters','Room details','Register']],['Customer',['Login','Home and room search','Room details','Booking form','Payment','Booking confirmation','Booking history']],
+['Receptionist',['Login','Front desk dashboard','Pending bookings','Check-in and room assignment','Extra services','Check-out and invoice']],['Admin',['Login','Admin dashboard','Room types','Room management','Price list','Occupancy report and export']]];
+const SHOT=[['Sign in','Login and register','login','auth'],['Room search','Search and results','search','c:search'],['Room details','Photos, amenities, price','bed','detail:dlx'],['Booking and payment','Deposit and payment method','card','book:dlx'],['Front desk','Confirm and check in','bell','d:overview'],['Admin','Reports and rooms','chart','a:dash']];
+function pMap(){const A=['All','Guest','Customer','Receptionist','Admin'],rows=MAP.filter(r=>S.actor==='All'||r[1].includes(S.actor)||r[1]==='All roles');return `
+ <div class="panel"><div class="panel-h"><h2>Screen flow by role</h2></div><div class="panel-b stack" style="gap:14px">${FLOWS.map(([r,f])=>`<div><div class="hint" style="margin-bottom:6px;font-weight:600">${r}</div><div class="flow">${f.map(x=>`<span class="st">${x}</span>`).join('<span class="ar">›</span>')}</div></div>`).join('')}</div></div>
+ <div class="panel" style="margin-top:24px"><div class="panel-h"><h2>Screens and traceability</h2><div class="tabs" role="group" aria-label="Filter by actor">${A.map(a=>`<button class="${a===S.actor?'on':''}" data-act="actor:${a}">${a}</button>`).join('')}</div></div>
+ <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Screen</th><th>Actor</th><th>Requirement</th><th>Use case</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</tbody></table></div></div>
+ <h3 class="sec-h" style="margin:32px 0 14px">Open a screen</h3><div class="cols c3">${SHOT.map(s=>`<button class="mock" data-act="shot:${s[3]}"><span class="bx">${ic(s[2])}</span><span><b>${s[0]}</b><small>${s[1]}</small></span></button>`).join('')}</div>`}
+const PAGES={'customer.search':pSearch,'customer.bookings':pBookings,'customer.profile':pProfile,'desk.overview':pOverview,'desk.checkin':pCheckin,'desk.inhouse':pInhouse,'admin.dash':pDash,'admin.rooms':pRooms,'admin.types':pTypes,'admin.services':pServices,'admin.staff':pStaff,'docs.map':pMap};
+
+/* ---------------- modal and toast ---------------- */
+let lastFocus=null;
+function modal(title,body,foot='',wide=false,head=''){lastFocus=document.activeElement;
+ $('#modal-root').innerHTML=`<div class="backdrop" data-act="backdrop"><div class="dialog ${wide?'wide':''}" role="dialog" aria-modal="true" aria-labelledby="mt">${head}<div class="dlg-h"><h3 id="mt">${title}</h3><button class="icon-btn" data-act="close" aria-label="Close">${ic('x')}</button></div><div class="dlg-b">${body}</div>${foot?`<div class="dlg-f">${foot}</div>`:''}</div></div>`;
+ setTimeout(()=>{const d=$('.dialog input:not([readonly]):not([type=radio]):not([type=checkbox]),.dialog select,.dialog .btn:not([disabled])');d&&d.focus()},30)}
+function closeM(){$('#modal-root').innerHTML='';lastFocus&&lastFocus.focus&&lastFocus.focus()}
+function toast(msg,sub='',type=''){const t=document.createElement('div');t.className='toast '+type;t.innerHTML=`<div><b>${msg}</b>${sub?`<small>${sub}</small>`:''}</div>`;$('#toasts').append(t);setTimeout(()=>t.remove(),4800)}
+const sumRows=(rows,total)=>`<div class="sum">${rows.map(r=>`<div><span>${r[0]}</span><span>${r[1]}</span></div>`).join('')}${total?`<div class="t"><span>${total[0]}</span><b>${total[1]}</b></div>`:''}</div>`;
+const errBox=(id,msg='')=>`<div class="err" id="${id}" role="alert">${msg?ic('warn','sm')+msg:''}</div>`;
+const POLICY=[['Check-in','From 14:00, with an ID or passport'],['Check-out','By 12:00. Later departures pay half a night'],['Deposit','30% of the room total, rounded to the nearest 1,000 VND, due within 24 hours'],['Cancellation','100% refund at 48 hours or more before check-in, 50% from 24 to 48 hours, none under 24 hours'],['Stay length','Up to 30 nights per booking']];
+
+/* ---------------- room details and booking ---------------- */
+function mDetail(id){const t=T(id),q=S.search,de=dateErr(q),n=de?1:nights(q.ci,q.co),ce=capErr(t,q),left=de?t.left:roomsLeft(t,q),off=!!(de||ce||left<=0);
+ modal(esc(t.name),`<p>${esc(t.desc)}</p><div class="meta"><span>${ic('bed','sm')}${t.bed}</span><span>${ic('guests','sm')}Up to ${t.cap} guests</span><span>${ic('expand','sm')}${t.area} m²</span></div><div class="chips">${t.am.map(a=>`<span class="chip">${esc(a)}</span>`).join('')}</div>
+ ${sumRows(POLICY)}${de?errBox('dt-err',de):ce?errBox('dt-err',ce):left<=0?errBox('dt-err','No rooms left for these dates. Try other dates.'):''}`,
+ `<div style="margin-right:auto"><small class="hint">${n} night${n>1?'s':''}, ${fmt(t.rate)} per night</small><div style="font:600 26px var(--display)">${fmt(t.rate*n)}</div></div><button class="btn ghost" data-act="close">Close</button><button class="btn" data-act="book:${id}" ${off?'disabled':''}>Book now</button>`,true,photo(t,0))}
+function mBook(id){
+ const t=T(id),q=S.search,de=dateErr(q);
+ if(!S.user){S.after={book:id};return mAuth('login','Sign in or create an account to book this room.')}
+ if(de){toast('Check your dates',de,'bad');closeM();return}
+ if(roomsLeft(t,q)<=0){toast('This room type is sold out','Try other dates.','bad');closeM();return}
+ const n=nights(q.ci,q.co),tot=t.rate*n,d=deposit(tot);
+ modal('Confirm your booking',`<div><b style="font:600 26px var(--display)">${esc(t.name)}</b><div class="hint">${dmy(q.ci)} to ${dmy(q.co)}, ${n} night${n>1?'s':''}</div></div>
+ <form id="bk" data-form="mkbook:${id}" class="stack" style="gap:16px" novalidate>
+ <div class="cols c2" style="gap:12px"><label class="field"><span>Adults</span><select class="input" name="a">${opts(1,6,q.adults)}</select></label><label class="field"><span>Children</span><select class="input" name="c">${opts(0,4,q.children)}</select></label></div>
+ ${errBox('bk-err',capErr(t,q))}
+ <label class="field"><span>Special requests (optional)</span><textarea class="input" name="note" rows="2" maxlength="200" placeholder="Late arrival, extra pillows, quiet floor"></textarea></label></form>
+ ${sumRows([[`${fmt(t.rate)} × ${n} night${n>1?'s':''}`,fmt(tot)],['30% of the room total, rounded to 1,000',fmt(d)],['Balance at check-out',fmt(tot-d)]],['Deposit due now',fmt(d)])}
+ <p class="hint">${ic('info','sm')} The room is held for 24 hours. VAT 10% is added to the final invoice at check-out.</p>`,
+ `<button class="btn ghost" data-act="close">Back</button><button class="btn" form="bk" id="bk-go" ${capErr(t,q)?'disabled':''}>Create booking and pay</button>`)}
+function bkRefresh(id){const t=T(id),f=$('#bk'),q={adults:+f.a.value,children:+f.c.value},e=capErr(t,q);$('#bk-err').innerHTML=e?ic('warn','sm')+e:'';$('#bk-go').disabled=!!e}
+function mPay(code){const b=S.mine.find(x=>x.code===code),amt=deposit(b.total)-b.dep;
+ modal('Pay deposit',`<div class="hint">Booking ${b.code}, ${esc(T(b.type).name)}</div>
+ <label class="pay"><input type="radio" name="pm" value="Bank card" checked>${ic('card')}<span><b>Bank card</b><div class="hint">Simulated payment</div></span></label>
+ <label class="pay"><input type="radio" name="pm" value="E-wallet">${ic('wallet')}<span><b>E-wallet</b><div class="hint">Simulated payment</div></span></label>
+ ${sumRows([['Room total',fmt(b.total)],['Deposit already paid',fmt(b.dep)]],['Amount to pay now',fmt(amt)])}
+ <label class="row hint" style="gap:8px"><input type="checkbox" id="pay-fail" style="accent-color:var(--pine);width:16px;height:16px"><span>Demo only: simulate a declined payment</span></label>${errBox('pay-err')}`,
+ `<button class="btn ghost" data-act="close">Pay later</button><button class="btn" data-act="dopay:${code}">Pay ${fmt(amt)}</button>`)}
+function mConfirm(code){const b=S.mine.find(x=>x.code===code),t=T(b.type),n=nights(b.ci,b.co);
+ modal('Deposit received',`<div class="okmark">${ic('check','lg')}</div><div style="text-align:center"><div class="hint">Your booking code</div><div class="bigcode">${b.code}</div><button class="btn ghost sm" data-act="copy:${b.code}">Copy code</button></div>
+ ${sumRows([['Room',esc(t.name)],['Stay',`${dmy(b.ci)} to ${dmy(b.co)}, ${n} night${n>1?'s':''}`],['Guests',`${b.adults} adult${b.adults>1?'s':''}${b.children?`, ${b.children} child${b.children>1?'ren':''}`:''}`],['Room total',fmt(b.total)],['Deposit paid',fmt(b.dep)]],['Balance at check-out',fmt(b.total-b.dep)])}
+ <ol class="next"><li>The front desk reviews your booking and confirms it. We email ${esc(S.user.email)}.</li><li>You pay the balance, plus VAT 10%, when you check out.</li><li>Check in from 14:00 with your ID or passport.</li></ol>`,
+ `<button class="btn ghost" data-act="print">${ic('print','sm')}Print</button><button class="btn" data-act="close">View my bookings</button>`)}
+function steps(b){if(['cancelled','rejected'].includes(b.status))return `<div class="alert bad">${ic('x')}<div><b>${b.status==='rejected'?'The hotel could not confirm this booking':'This booking was cancelled'}</b>${b.status==='rejected'?'Any deposit paid is refunded.':'The room was released.'}</div></div>`;
+ const i=['unpaid','paid','confirmed','completed'].indexOf(b.status),L=['Booking created','Deposit paid','Confirmed by the hotel','Stay completed'];
+ return `<ol class="tl">${L.map((l,k)=>`<li class="${k<=i?'on':''}">${l}</li>`).join('')}</ol>`}
+function mBDetail(code){const b=S.mine.find(x=>x.code===code),t=T(b.type),n=nights(b.ci,b.co),h=hoursTo(b),canEdit=ACTIVE.includes(b.status),late=h<48;
+ modal('Booking '+b.code,`<div class="row" style="justify-content:space-between">${pill(b.status)}<span class="hint">${b.made?'Booked '+b.made:''}</span></div>${steps(b)}
+ ${sumRows([['Room',esc(t.name)],['Stay',`${dmy(b.ci)} to ${dmy(b.co)}, ${n} night${n>1?'s':''}`],['Guests',`${b.adults} adult${b.adults>1?'s':''}${b.children?`, ${b.children} child${b.children>1?'ren':''}`:''}`],['Special requests',b.note?esc(b.note):'None'],['Room total',fmt(b.total)],['Deposit paid',fmt(b.dep)]],['Balance at check-out',fmt(b.total-b.dep)])}
+ ${b.status==='unpaid'?`<div class="alert warn">${ic('info')}<div><b>Deposit due: ${fmt(deposit(b.total)-b.dep)}</b>Pay by ${b.hold} or the room is released.</div></div>`:''}
+ ${canEdit&&late?`<p class="hint">Dates can be changed up to 48 hours before check-in. You can still cancel.</p>`:''}`,
+ `<button class="btn ghost" data-act="close">Close</button>${canEdit?`<button class="btn bad" data-act="cancel:${b.code}">Cancel booking</button><button class="btn ghost" data-act="change:${b.code}" ${late?'disabled':''}>Change dates</button>`:''}${b.status==='unpaid'?`<button class="btn" data-act="pay:${b.code}">Pay deposit</button>`:''}`)}
+function mChange(code){const b=S.mine.find(x=>x.code===code);
+ modal('Change dates',`<div class="hint">${b.code}, ${esc(T(b.type).name)}. Now ${dmy(b.ci)} to ${dmy(b.co)}.</div>
+ <form id="chg" data-form="change:${code}" class="cols c2" style="gap:12px" novalidate><label class="field"><span>New check-in</span><input class="input" type="date" id="c-ci" min="${TODAY}" value="${b.ci}"></label><label class="field"><span>New check-out</span><input class="input" type="date" id="c-co" value="${b.co}"></label></form>
+ ${errBox('chg-err')}<div id="chg-sum"></div>`,
+ `<button class="btn ghost" data-act="close">Keep current dates</button><button class="btn" form="chg" id="chg-ok">Save new dates</button>`);chgRefresh(code)}
+function chgCalc(code){const b=S.mine.find(x=>x.code===code),q={ci:$('#c-ci').value,co:$('#c-co').value};let e=dateErr(q);
+ if(!e&&q.ci===b.ci&&q.co===b.co)e='These are your current dates.';
+ if(!e&&hoursTo({ci:q.ci})<48)e='The new check-in must be at least 48 hours from now.';
+ const t=T(b.type);if(!e&&roomsLeft(t,q,code)<=0)e='No rooms of this type are left for these dates.';
+ if(e)return{e,q,b};const n=nights(q.ci,q.co),total=t.rate*n,nd=deposit(total);return{e:'',q,b,n,total,nd,diff:b.status==='unpaid'?null:nd-b.dep}}
+function chgRefresh(code){const c=chgCalc(code);$('#chg-err').innerHTML=c.e?ic('warn','sm')+c.e:'';$('#chg-ok').disabled=!!c.e;
+ $('#c-ci').setAttribute('aria-invalid',!!c.e&&c.e.includes('check-in'));$('#c-co').setAttribute('aria-invalid',!!c.e&&c.e.includes('Check-out'));
+ $('#chg-sum').innerHTML=c.e?'':sumRows([['New stay',`${dmy(c.q.ci)} to ${dmy(c.q.co)}, ${c.n} night${c.n>1?'s':''}`],['Previous room total',fmt(c.b.total)],['New room total',fmt(c.total)]],['Deposit (30%)',fmt(c.nd)])+
+  `<p class="hint" style="margin-top:12px">${c.diff===null?'Your deposit is still due. You pay the new amount.':c.diff>0?`Extra deposit to pay now: <b>${fmt(c.diff)}</b>. The front desk then confirms the new dates again.`:c.diff<0?`<b>${fmt(-c.diff)}</b> goes back to your payment method.`:'Your deposit does not change.'}</p>`}
+function mInvoiceView(code){const b=S.mine.find(x=>x.code===code),vat=Math.round(b.total*.1);
+ modal('Invoice '+b.inv,`<div class="hint">Booking ${b.code}, ${esc(T(b.type).name)}, ${dmy(b.ci)} to ${dmy(b.co)}</div>${sumRows([['Room charge',fmt(b.total)],['VAT 10%',fmt(vat)],['Paid (deposit and balance)',fmt(b.total+vat)]],['Balance due','0 VND'])}<p class="hint">This invoice is final and cannot be edited.</p>`,
+ `<button class="btn ghost" data-act="close">Close</button><button class="btn" data-act="print">${ic('print','sm')}Print</button>`)}
+function mCancel(code){const b=S.mine.find(x=>x.code===code),h=hoursTo(b),rate=h>=48?100:h>=24?50:0;
+ modal('Cancel this booking?',`<div class="hint">${b.code}, ${esc(T(b.type).name)}, ${dmy(b.ci)} to ${dmy(b.co)}</div>
+ ${sumRows([['Check-in in',Math.max(0,Math.round(h))+' hours'],['Refund rate',rate+'%'],['Deposit paid',fmt(b.dep)]],['Refund',fmt(b.dep*rate/100)])}
+ <p class="hint">Refund policy: 100% at 48 hours or more, 50% from 24 to 48 hours, 0% under 24 hours before check-in. This cannot be undone.</p>`,
+ `<button class="btn ghost" data-act="close">Keep booking</button><button class="btn bad" data-act="docancel:${code}">Cancel booking</button>`)}
+
+/* ---------------- auth ---------------- */
+function mAuth(v,note){if(typeof v==='string')S.auth=v;v=S.auth;
+ const tabs=v==='login'||v==='register'?`<div class="tabs" style="align-self:flex-start"><button class="${v==='login'?'on':''}" data-act="auth:login">Sign in</button><button class="${v==='register'?'on':''}" data-act="auth:register">Register</button></div>`:'';
+ const f={login:`<label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email"></label><label class="field"><span>Password</span><input class="input" type="password" name="pw" required autocomplete="current-password"></label><button type="button" class="hint" style="text-align:left;color:var(--pine);font-weight:600" data-act="auth:forgot">Forgot your password?</button><p class="hint">Demo account: ${EM}, password 12345678</p>`,
+ register:`<label class="field"><span>Full name</span><input class="input" name="name" required></label><label class="field"><span>Email</span><input class="input" type="email" name="email" required></label><label class="field"><span>Phone number</span><input class="input" name="phone" inputmode="tel" required></label><label class="field"><span>Password</span><input class="input" type="password" name="pw" minlength="8" required><span class="hint" style="font-weight:400">At least 8 characters</span></label>`,
+ forgot:`<p class="hint">Enter your email and we will send a reset code. The code works once and expires in 30 minutes.</p><label class="field"><span>Email</span><input class="input" type="email" name="email" required></label>`,
+ reset:`<p class="hint">Demo only: the code is 123456.</p><label class="field"><span>Reset code</span><input class="input" name="code" inputmode="numeric" maxlength="6" required></label><label class="field"><span>New password</span><input class="input" type="password" name="pw" minlength="8" required></label>`}[v];
+ const btn={login:'Sign in',register:'Create account',forgot:'Send reset code',reset:'Save new password'}[v];
+ modal({login:'Welcome back',register:'Create your account',forgot:'Reset your password',reset:'Enter your reset code'}[v],
+ `${note?`<div class="alert info">${ic('info')}<div>${note}</div></div>`:''}${tabs}<form data-form="auth" class="stack" style="gap:14px" novalidate>${f}${errBox('au-err')}<button class="btn block lg">${btn}</button>${v==='forgot'||v==='reset'?`<button type="button" class="hint" data-act="auth:login" style="color:var(--pine);font-weight:600">Back to sign in</button>`:''}</form>`)}
+
+/* ---------------- front desk dialogs ---------------- */
+function mReject(code){modal('Reject booking '+code,`<p class="hint">The customer is told the booking was rejected and any deposit is refunded.</p><form id="rj" data-form="reject:${code}" class="stack" style="gap:12px"><label class="field"><span>Reason</span><textarea class="input" name="why" rows="3" placeholder="For example, the room is no longer available"></textarea></label>${errBox('rj-err')}</form>`,
+ `<button class="btn ghost" data-act="close">Cancel</button><button class="btn bad" form="rj">Reject booking</button>`)}
+function mWalk(){modal('New walk-in booking',`<form id="wk" data-form="walk" class="stack" style="gap:14px" novalidate><label class="field"><span>Guest name</span><input class="input" name="g" required></label><label class="field"><span>Phone number</span><input class="input" name="p" inputmode="tel" required></label>
+ <div class="cols c2" style="gap:12px"><label class="field"><span>Room type</span><select class="input" name="t">${TYPES.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select></label><label class="field"><span>Nights</span><input class="input" type="number" name="n" min="1" max="30" value="1"></label></div>
+ <label class="field"><span>Guests</span><input class="input" type="number" name="q" min="1" max="6" value="2"></label>${errBox('wk-err')}
+ <p class="hint">Walk-in guests do not need an account. The booking is confirmed straight away, then continue to check-in. The guest pays at check-out.</p></form>`,`<button class="btn ghost" data-act="close">Cancel</button><button class="btn" form="wk">Create booking</button>`)}
+function mCheckin(code){const a=S.arrivals.find(x=>x.code===code),free=S.rooms.filter(r=>r.t===a.type&&r.s==='Available');
+ modal('Check in '+esc(a.guest),`<div class="hint">${a.code}, ${esc(T(a.type).name)}, ${dmy(a.ci)} to ${dmy(a.co)}</div><form id="ci" data-form="checkin:${code}" class="stack" style="gap:14px" novalidate>
+ <label class="field"><span>ID or passport number</span><input class="input" name="id" required placeholder="Required to check in"></label>
+ <label class="field"><span>Assign room</span><select class="input" name="room" ${free.length?'':'disabled'}>${free.length?free.map(r=>`<option value="${r.n}">Room ${r.n}, floor ${r.f}</option>`).join(''):'<option>No room available</option>'}</select></label>
+ ${free.length?'':'<div class="err">'+ic('warn','sm')+' No room of this type is available. Free one up in Rooms.</div>'}${errBox('ci-err')}</form>`,
+ `<button class="btn ghost" data-act="close">Cancel</button><button class="btn ok" form="ci" ${free.length?'':'disabled'}>Check in</button>`)}
+function mSvc(code){modal('Add a service',`<form id="sv" data-form="svc:${code}" class="stack" style="gap:14px"><label class="field"><span>Service</span><select class="input" name="s">${S.services.map((s,i)=>`<option value="${i}">${esc(s.n)}, ${fmt(s.p)}</option>`).join('')}</select></label><label class="field"><span>Quantity</span><input class="input" type="number" name="q" min="1" max="20" value="1"></label></form>`,
+ `<button class="btn ghost" data-act="close">Cancel</button><button class="btn" form="sv" ${S.services.length?'':'disabled'}>Add to bill</button>`)}
+function mCheckout(code,late=false){const g=S.inhouse.find(x=>x.code===code),b=bill(g,late);
+ modal('Check out '+esc(g.guest),`<div class="hint">Room ${g.room}, ${esc(T(g.type).name)}, ${dmy(g.ci)} to ${dmy(g.co)}</div>
+ <label class="row" style="gap:8px"><input type="checkbox" ${late?'checked':''} data-change="late:${code}" style="accent-color:var(--pine);width:16px;height:16px"><span>Guest leaves after 12:00 (late fee: half a night)</span></label>
+ ${sumRows([[`${esc(T(g.type).name)}, ${b.n} night${b.n>1?'s':''}`,fmt(b.room)],...g.svc.map(s=>[`${esc(s.n)} × ${s.q}`,fmt(s.p*s.q)]),...(b.lf?[['Late check-out fee',fmt(b.lf)]]:[]),['VAT 10%',fmt(b.vat)],['Total',fmt(b.total)],['Deposit paid','− '+fmt(g.dep)]],['Balance to collect',fmt(b.bal)])}
+ <label class="field"><span>Payment method</span><select class="input" id="co-pm"><option>Cash</option><option>Bank card (simulated)</option><option>E-wallet (simulated)</option></select></label>`,
+ `<button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="docheckout:${code}:${late?1:0}">${ic('print','sm')}Collect ${fmt(b.bal)} and issue invoice</button>`)}
+function mInvDesk(inv,g,b,pm){modal('Invoice '+inv,`<div class="hint">Room ${g.room}, ${esc(g.guest)}, ${g.code}</div>${sumRows([[`${esc(T(g.type).name)}, ${b.n} night${b.n>1?'s':''}`,fmt(b.room)],...g.svc.map(s=>[`${esc(s.n)} × ${s.q}`,fmt(s.p*s.q)]),...(b.lf?[['Late check-out fee',fmt(b.lf)]]:[]),['VAT 10%',fmt(b.vat)],['Total',fmt(b.total)],['Deposit paid','− '+fmt(g.dep)],[`Paid by ${esc(pm)}`,fmt(b.bal)]],['Balance due','0 VND'])}<p class="hint">Room ${g.room} is now marked Cleaning. This invoice is final and cannot be edited.</p>`,
+ `<button class="btn ghost" data-act="close">Close</button><button class="btn" data-act="print">${ic('print','sm')}Print invoice</button>`)}
+
+/* ---------------- admin dialogs ---------------- */
+function mRoom(n){const r=n?S.rooms.find(x=>x.n===n):null;
+ modal(r?'Edit room '+r.n:'Add a room',`<form id="rm" data-form="room:${n||''}" class="stack" style="gap:14px" novalidate><label class="field"><span>Room number</span><input class="input" name="n" value="${r?r.n:''}" ${r?'readonly':'required'}></label>
+ <div class="cols c2" style="gap:12px"><label class="field"><span>Type</span><select class="input" name="t">${TYPES.map(t=>`<option value="${t.id}" ${r&&r.t===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}</select></label><label class="field"><span>Floor</span><input class="input" type="number" name="f" min="1" max="20" value="${r?r.f:1}"></label></div>
+ <label class="field"><span>Status</span><select class="input" name="s">${Object.keys(RS).map(s=>`<option ${r&&r.s===s?'selected':''}>${s}</option>`).join('')}</select></label>${errBox('rm-err')}</form>`,
+ `<button class="btn ghost" data-act="close">Cancel</button><button class="btn" form="rm">${r?'Save changes':'Add room'}</button>`)}
+function mType(id){const t=id?T(id):null;
+ modal(t?'Edit '+esc(t.name):'Add a room type',`<form id="ty" data-form="type:${id||''}" class="stack" style="gap:14px" novalidate><label class="field"><span>Name</span><input class="input" name="name" value="${t?esc(t.name):''}" required></label>
+ <div class="cols c2" style="gap:12px"><label class="field"><span>Bed</span><input class="input" name="bed" value="${t?esc(t.bed):''}" placeholder="1 king bed" required></label><label class="field"><span>Sleeps up to</span><input class="input" type="number" name="cap" min="1" max="8" value="${t?t.cap:2}"></label></div>
+ <div class="cols c2" style="gap:12px"><label class="field"><span>Size (m²)</span><input class="input" type="number" name="area" min="10" max="300" value="${t?t.area:30}"></label><label class="field"><span>Rate per night (VND)</span><input class="input" type="number" name="rate" min="100000" step="10000" value="${t?t.rate:800000}"></label></div>
+ <label class="field"><span>Amenities, separated by commas</span><input class="input" name="am" value="${t?esc(t.am.join(', ')):''}" placeholder="Free Wi-Fi, City view"></label>${errBox('ty-err')}
+ <p class="hint">The new rate applies to new bookings only.</p></form>`,`<button class="btn ghost" data-act="close">Cancel</button><button class="btn" form="ty">${t?'Save changes':'Add room type'}</button>`)}
+function mSvcAdmin(i){const s=i===undefined||i===''?null:S.services[+i];
+ modal(s?'Edit service':'Add a service',`<form id="sa" data-form="svcadmin:${s?i:''}" class="stack" style="gap:14px" novalidate><label class="field"><span>Service name</span><input class="input" name="n" value="${s?esc(s.n):''}" required></label><label class="field"><span>Price (VND)</span><input class="input" type="number" name="p" min="1000" step="1000" value="${s?s.p:100000}"></label>${errBox('sa-err')}</form>`,
+ `<button class="btn ghost" data-act="close">Cancel</button><button class="btn" form="sa">${s?'Save changes':'Add service'}</button>`)}
+function mStaff(){modal('Add a staff account',`<form id="st" data-form="staff" class="stack" style="gap:14px" novalidate><label class="field"><span>Full name</span><input class="input" name="n" required></label><label class="field"><span>Email</span><input class="input" type="email" name="e" required></label>
+ <label class="field"><span>Role</span><select class="input" name="r"><option>Receptionist</option><option>Admin</option></select></label>${errBox('st-err')}<p class="hint">A temporary password is emailed. The staff member must change it at first sign-in.</p></form>`,
+ `<button class="btn ghost" data-act="close">Cancel</button><button class="btn" form="st">Create account</button>`)}
+
+/* ---------------- actions ---------------- */
+const owner=b=>S.accounts.find(a=>a.email===b.owner)||{name:'Guest',phone:''};
+function syncPending(b){let p=S.pending.find(x=>x.code===b.code);
+ if(!p){const o=owner(b);p={code:b.code,guest:o.name,phone:o.phone,at:'30/10 '+clock()};S.pending.push(p)}
+ Object.assign(p,{type:b.type,ci:b.ci,co:b.co,dep:b.dep||deposit(b.total),paid:b.status!=='unpaid'})}
+const A={
+ role:(_,r)=>{S.flash=null;go(r)},page:(_,p)=>{S.flash=null;go(S.role,p)},docs:()=>go('docs','map'),close:closeM,backdrop:closeM,
+ auth:(_,v)=>mAuth(typeof v==='string'?v:'login'),
+ signout:()=>{S.user=null;S.flash=null;toast('Signed out','See you again soon.','info');if(S.role==='customer'&&S.page!=='search')S.page='search';render()},
+ detail:(_,id)=>mDetail(id),book:(_,id)=>mBook(id),bfilter:(_,f)=>{S.bfilter=f;render()},
+ pay:(_,c)=>mPay(c),
+ dopay:(_,c)=>{const b=S.mine.find(x=>x.code===c);
+  if($('#pay-fail')&&$('#pay-fail').checked){$('#pay-err').innerHTML=ic('warn','sm')+`The payment was declined. Nothing was charged. Your booking is held until ${b.hold||'the hold expires'}.`;return}
+  const amt=deposit(b.total)-b.dep;b.dep+=amt;if(b.status==='unpaid')b.status='paid';syncPending(b);S.flash=c;
+  go('customer','bookings');mConfirm(c)},
+ bdetail:(_,c)=>mBDetail(c),change:(_,c)=>mChange(c),cancel:(_,c)=>mCancel(c),
+ docancel:(_,c)=>{const b=S.mine.find(x=>x.code===c),rate=hoursTo(b)>=48?100:hoursTo(b)>=24?50:0,ref=b.dep*rate/100;b.status='cancelled';S.pending=S.pending.filter(p=>p.code!==c);closeM();toast('Booking cancelled',ref?`${c} was cancelled. ${fmt(ref)} is refunded to your payment method.`:`${c} was cancelled and the room released.`);render()},
+ copy:(_,c)=>{try{navigator.clipboard.writeText(c)}catch(e){}toast('Code copied',c)},
+ inv:(_,c)=>mInvoiceView(c),print:()=>toast('Sent to the printer'),
+ confirm:(_,c)=>{const p=S.pending.find(x=>x.code===c),b=S.mine.find(x=>x.code===c);S.pending=S.pending.filter(x=>x.code!==c);if(b)b.status='confirmed';
+  if(p&&p.ci===TODAY)S.arrivals.push({code:p.code,guest:p.guest,phone:p.phone,type:p.type,ci:p.ci,co:p.co,dep:p.dep});
+  toast('Booking confirmed',`${c}: confirmation email sent to the customer.`);render()},
+ reject:(_,c)=>mReject(c),walkin:mWalk,checkin:(_,c)=>mCheckin(c),svc:(_,c)=>mSvc(c),checkout:(_,c)=>mCheckout(c),
+ docheckout:(_,c,l)=>{const g=S.inhouse.find(x=>x.code===c),b=bill(g,l==='1'),inv=`INV-${TODAY.replace(/-/g,'')}-${pad(S.invSeq++,4)}`,pm=($('#co-pm')||{}).value||'Cash';S.rooms.find(r=>r.n===g.room).s='Cleaning';S.inhouse=S.inhouse.filter(x=>x!==g);
+  const bk=S.mine.find(x=>x.code===c);if(bk){bk.status='completed';bk.inv=inv}
+  closeM();toast('Check-out complete',`${inv} issued. Room ${g.room} is now marked Cleaning.`);render();mInvDesk(inv,g,b,pm)},
+ export:(_,k)=>toast(`Report exported to ${k}`,`Revenue and occupancy, ${REPORT[S.period].label}.`),metric:(_,m)=>{S.metric=m;render()},period:(_,p)=>{S.period=p;render()},actor:(_,a)=>{S.actor=a;render()},
+ addroom:()=>mRoom(),editroom:(_,n)=>mRoom(n),
+ addtype:()=>mType(),edittype:(_,i)=>mType(i),
+ deltype:(_,i)=>{const t=T(i);if(S.rooms.some(r=>r.t===i))return toast('Cannot delete this type','Rooms still use it.','bad');TYPES.splice(TYPES.indexOf(t),1);if(S.search.type===i)S.search.type='any';toast('Room type deleted',t.name);render()},
+ addsvc:()=>mSvcAdmin(),editsvc:(_,i)=>mSvcAdmin(i),delsvc:(_,i)=>{const s=S.services.splice(+i,1)[0];toast('Service removed',s.n);render()},
+ addstaff:mStaff,lockstaff:(_,i)=>{const s=S.staff[+i];s.on=!s.on;toast(s.on?'Account unlocked':'Account locked',s.n,s.on?'':'info');render()},resetstaff:(_,i)=>toast('Password reset sent',`A temporary password was emailed to ${S.staff[+i].e}.`),
+ shot:(_,k,v)=>{const m={auth:()=>{go('customer','search');mAuth('login')},c:()=>go('customer','search'),d:()=>go('desk','overview'),a:()=>go('admin','dash')};
+  if(k==='auth')m.auth();else if(k==='detail'){go('customer','search');mDetail(v)}else if(k==='book'){go('customer','search');mBook(v)}else m[k]()}
+};
+document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||t.disabled)return;const [n,...a]=t.dataset.act.split(':');if(!A[n]||(n==='backdrop'&&e.target!==t))return;A[n](t,...a)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modal-root').firstChild)closeM()});
+function live(e){const f=e.target.closest('form[data-form]');if(!f)return false;const [n,a]=f.dataset.form.split(':');
+ if(n==='search'){readSearch();return true}if(n==='mkbook'){bkRefresh(a);return true}if(n==='change'){chgRefresh(a);return true}return false}
+document.addEventListener('input',e=>{if(e.target.dataset.input==='arr'){const q=e.target.value.toLowerCase().trim();$('#arr-b').innerHTML=arrRows(S.arrivals.filter(a=>(a.code+a.guest+a.phone).toLowerCase().includes(q)))}else live(e)});
+document.addEventListener('change',e=>{const t=e.target.closest('[data-change]');
+ if(t){const [n,c]=t.dataset.change.split(':');if(n==='sort'){S.search.sort=t.value;results()}if(n==='price'){S.search.price=t.value;results()}if(n==='late')mCheckout(c,t.checked);return}
+ live(e)});
+const mail=s=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s),digits=s=>(s||'').replace(/\D/g,'').length;
+function signedIn(u){S.user={email:u.email,name:u.name,phone:u.phone,pw:u.pw};closeM();const aft=S.after;S.after=null;render();if(aft&&aft.book)mBook(aft.book)}
+document.addEventListener('submit',e=>{const f=e.target.closest('[data-form]');if(!f)return;e.preventDefault();const [n,a]=f.dataset.form.split(':'),d=Object.fromEntries(new FormData(f));
+ if(n==='search'){readSearch()}
+ if(n==='mkbook'){const t=T(a),q=S.search,ad=+d.a,ch=+d.c,ce=capErr(t,{adults:ad,children:ch}),de=dateErr(q);if(ce||de||roomsLeft(t,q)<=0)return;
+  const nn=nights(q.ci,q.co),total=t.rate*nn,code=newCode(q.ci);q.adults=ad;q.children=ch;
+  S.mine.unshift({code,owner:S.user.email,type:a,ci:q.ci,co:q.co,adults:ad,children:ch,note:(d.note||'').trim(),total,dep:0,status:'unpaid',fresh:true,made:'30/10 '+clock(),hold:'31/10 '+clock()});
+  syncPending(S.mine[0]);S.flash=code;closeM();go('customer','bookings');mPay(code)}
+ if(n==='change'){const c=chgCalc(a);if(c.e)return;const b=c.b;b.ci=c.q.ci;b.co=c.q.co;b.total=c.total;b.fresh=true;S.flash=a;
+  if(c.diff===null){syncPending(b);closeM();toast('Dates changed',`${a} now runs ${dmy(b.ci)} to ${dmy(b.co)}. The deposit is now ${fmt(c.nd)}.`);render()}
+  else if(c.diff>0){b.status='unpaid';b.hold='31/10 '+clock();syncPending(b);closeM();render();toast('Dates changed','Pay the extra deposit to keep the booking.','info');mPay(a)}
+  else{b.dep=c.nd;syncPending(b);closeM();toast('Dates changed',c.diff<0?`${fmt(-c.diff)} goes back to your payment method.`:'Your deposit does not change.');render()}}
+ if(n==='profile'){const er=$('#pf-err');er.textContent='';
+  if(!d.name.trim())return er.textContent='Enter your full name.';
+  if(digits(d.phone)<9)return er.textContent='Enter a valid phone number.';
+  if(d.new){if(d.cur!==S.user.pw)return er.textContent='Your current password is not correct.';if(d.new.length<8)return er.textContent='The new password needs at least 8 characters.'}
+  const acct=S.accounts.find(x=>x.email===S.user.email);acct.name=S.user.name=d.name.trim();acct.phone=S.user.phone=d.phone.trim();if(d.new)acct.pw=S.user.pw=d.new;toast('Profile updated');render()}
+ if(n==='auth'){const er=$('#au-err'),v=S.auth;er.textContent='';const bad=m=>er.innerHTML=ic('warn','sm')+m;
+  if(v==='login'){const u=S.accounts.find(x=>x.email===(d.email||'').trim().toLowerCase()&&x.pw===d.pw);if(!u)return bad('The email or password is not correct.');toast('Signed in',`Welcome back, ${esc(u.name)}.`);signedIn(u)}
+  else if(v==='register'){const em=(d.email||'').trim().toLowerCase();
+   if(!(d.name||'').trim())return bad('Enter your full name.');if(!mail(em))return bad('Enter a valid email address.');if(S.accounts.some(x=>x.email===em))return bad('An account with this email already exists. Sign in instead.');
+   if(digits(d.phone)<9)return bad('Enter a valid phone number.');if((d.pw||'').length<8)return bad('Use a password with at least 8 characters.');
+   const u={email:em,pw:d.pw,name:d.name.trim(),phone:d.phone.trim()};S.accounts.push(u);toast('Account created',`Welcome, ${esc(u.name)}.`);signedIn(u)}
+  else if(v==='forgot'){const em=(d.email||'').trim().toLowerCase();if(!mail(em))return bad('Enter a valid email address.');S.resetEmail=em;S.auth='reset';toast('Reset code sent','It works once and expires in 30 minutes.','info');mAuth()}
+  else{if(d.code!=='123456')return bad('This code is not correct or has expired.');if((d.pw||'').length<8)return bad('Use a password with at least 8 characters.');const u=S.accounts.find(x=>x.email===S.resetEmail);if(u)u.pw=d.pw;toast('Password updated','Sign in with your new password.');mAuth('login')}}
+ if(n==='reject'){if(!(d.why||'').trim())return $('#rj-err').innerHTML=ic('warn','sm')+'Enter a reason so the customer knows why.';const b=S.mine.find(x=>x.code===a);if(b)b.status='rejected';S.pending=S.pending.filter(p=>p.code!==a);closeM();toast('Booking rejected',`${a}: the customer was notified and the deposit queued for refund.`,'info');render()}
+ if(n==='walk'){const er=$('#wk-err'),bad=m=>er.innerHTML=ic('warn','sm')+m,t=T(d.t),nn=+d.n,gq=+d.q;
+  if(!(d.g||'').trim())return bad('Enter the guest’s name.');if(digits(d.p)<9)return bad('Enter a valid phone number.');
+  if(!(nn>=1&&nn<=30))return bad('A stay is 1 to 30 nights.');if(gq<1)return bad('Enter the number of guests.');if(gq>t.cap)return bad(`${t.name} sleeps up to ${t.cap} guests, but you entered ${gq}.`);
+  if(!S.rooms.some(r=>r.t===d.t&&r.s==='Available'))return bad('No room of this type is available today. Pick another type.');
+  const code=newCode(TODAY);S.arrivals.unshift({code,guest:d.g.trim(),phone:d.p.trim(),type:d.t,ci:TODAY,co:addDays(TODAY,nn),dep:0});closeM();toast('Walk-in booking confirmed',`${code} is ready for check-in.`);go('desk','checkin')}
+ if(n==='checkin'){if((d.id||'').trim().length<6)return $('#ci-err').innerHTML=ic('warn','sm')+'Enter the ID or passport number to check in.';
+  const g=S.arrivals.find(x=>x.code===a);S.arrivals=S.arrivals.filter(x=>x!==g);S.rooms.find(r=>r.n===d.room).s='Occupied';S.inhouse.push({room:d.room,code:g.code,guest:g.guest,type:g.type,ci:g.ci,co:g.co,dep:g.dep,svc:[]});closeM();toast('Guest checked in',`${esc(g.guest)} is in room ${d.room}.`);render()}
+ if(n==='svc'){const g=S.inhouse.find(x=>x.code===a),s=S.services[+d.s],q=Math.max(1,+d.q||1);g.svc.push({n:s.n,q,p:s.p});closeM();toast('Service added',`${esc(s.n)} × ${q} for ${esc(g.guest)}.`);render()}
+ if(n==='room'){const er=$('#rm-err');
+  if(a){const r=S.rooms.find(x=>x.n===a);if(r.s==='Occupied'&&d.s==='Maintenance')return er.innerHTML=ic('warn','sm')+'An occupied room cannot go into maintenance. Check the guest out first.';r.t=d.t;r.f=+d.f;r.s=d.s;toast('Room updated',`Room ${a} saved.`)}
+  else{const nn=(d.n||'').trim();if(!nn)return er.innerHTML=ic('warn','sm')+'Enter a room number.';if(S.rooms.some(x=>x.n===nn))return er.innerHTML=ic('warn','sm')+'This room number already exists.';S.rooms.push({n:nn,t:d.t,f:+d.f,s:d.s});S.rooms.sort((x,y)=>x.n.localeCompare(y.n));toast('Room added',`Room ${nn} is in the list.`)}
+  closeM();render()}
+ if(n==='type'){const er=$('#ty-err'),bad=m=>er.innerHTML=ic('warn','sm')+m,cap=+d.cap,area=+d.area,rate=+d.rate;
+  if(!(d.name||'').trim())return bad('Enter a name.');if(!(d.bed||'').trim())return bad('Enter the bed type.');if(!(cap>=1&&cap<=8))return bad('Capacity is 1 to 8 guests.');if(!(area>=10))return bad('Enter the size in m².');if(!(rate>=100000))return bad('The rate must be at least 100,000 VND.');
+  if(TYPES.some(x=>x.name.toLowerCase()===d.name.trim().toLowerCase()&&x.id!==a))return bad('A room type with this name already exists.');
+  const am=(d.am||'').split(',').map(x=>x.trim()).filter(Boolean);
+  if(a){Object.assign(T(a),{name:d.name.trim(),bed:d.bed.trim(),cap,area,rate,am});toast('Room type saved',d.name.trim())}
+  else{TYPES.push({id:'t'+Date.now().toString(36),name:d.name.trim(),bed:d.bed.trim(),cap,area,rate,left:2,am,desc:'A room added by the hotel admin.'});toast('Room type added',d.name.trim())}
+  closeM();render()}
+ if(n==='svcadmin'){const er=$('#sa-err'),bad=m=>er.innerHTML=ic('warn','sm')+m,p=+d.p;if(!(d.n||'').trim())return bad('Enter a service name.');if(!(p>=1000))return bad('The price must be at least 1,000 VND.');
+  if(a!==''){S.services[+a]={n:d.n.trim(),p};toast('Service saved',d.n.trim())}else{S.services.push({n:d.n.trim(),p});toast('Service added',d.n.trim())}closeM();render()}
+ if(n==='staff'){const er=$('#st-err'),bad=m=>er.innerHTML=ic('warn','sm')+m,em=(d.e||'').trim().toLowerCase();if(!(d.n||'').trim())return bad('Enter the full name.');if(!mail(em))return bad('Enter a valid email address.');if(S.staff.some(s=>s.e===em))return bad('A staff account with this email already exists.');
+  S.staff.push({n:d.n.trim(),e:em,r:d.r,on:true});closeM();toast('Staff account created',`A temporary password was emailed to ${em}.`);render()}
+});
+render();
+})();
+</script>
+</body>
+</html>

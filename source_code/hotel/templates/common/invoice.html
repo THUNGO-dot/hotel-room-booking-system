@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, sumrows %}
+{% block title %}Invoice {{ inv.invoice_no }}{% endblock %}
+{% block content %}
+<div class="ph compact"><h1>Invoice</h1></div>
+<div class="panel invoice"><div class="panel-b">
+  <div class="inv-head"><div><div class="big-code" style="font-size:30px">{{ inv.invoice_no }}</div><div class="hint">Issued {{ inv.issued_at|dmyhm }}</div></div>
+    <div style="text-align:right"><b>Grand Horizon Hotel</b><div class="hint">Booking {{ inv.booking_code }}</div></div></div>
+  <dl class="kv"><dt>Guest</dt><dd>{{ inv.guest_name }}, {{ inv.guest_phone }}</dd><dt>Room</dt><dd>{{ inv.type_name }}{% if inv.room_number %}, room {{ inv.room_number }}{% endif %}</dd>
+    <dt>Stay</dt><dd>{{ inv.check_in_date|dmy }} to {{ inv.check_out_date|dmy }}</dd></dl>
+  <div class="tbl-wrap"><table class="tbl lines"><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Unit price</th><th class="r">Amount</th></tr></thead><tbody>
+    <tr><td>Room charge</td><td class="r num">1</td><td class="r num">{{ inv.room_charge|vnd }}</td><td class="r num">{{ inv.room_charge|vnd }}</td></tr>
+    {% for u in lines %}<tr><td>{{ u.name }}</td><td class="r num">{{ u.quantity }}</td><td class="r num">{{ u.unit_price|vnd }}</td><td class="r num">{{ (u.quantity * u.unit_price)|vnd }}</td></tr>{% endfor %}
+    {% if inv.late_fee %}<tr><td>Late check-out fee</td><td class="r num">1</td><td class="r num">{{ inv.late_fee|vnd }}</td><td class="r num">{{ inv.late_fee|vnd }}</td></tr>{% endif %}
+  </tbody></table></div>
+  {{ sumrows([('Subtotal', (inv.room_charge + inv.service_charge + inv.late_fee)|vnd), ('VAT ' ~ ((cfg.vat_rate * 100)|round|int) ~ '%', inv.vat_amount|vnd)], ('Total', inv.total_amount|vnd)) }}
+  <p class="hint">Deposit and balance payments are already included in the amounts you paid. This invoice cannot be changed after it is issued.</p>
+  <div class="row actions"><a class="btn ghost" href="#" data-print>{{ icon('print','sm') }}Print</a><a class="btn" href="{{ url_for('common.invoice_pdf', invoice_no=inv.invoice_no) }}">Download PDF</a>
+    {% if user.role == 'CUSTOMER' %}<a class="btn ghost" href="{{ url_for('public.booking_list') }}">My bookings</a>{% elif user.role == 'RECEPTIONIST' %}<a class="btn ghost" href="{{ url_for('desk.inhouse') }}">Back to front desk</a>{% endif %}</div>
+</div></div>
+{% endblock %}

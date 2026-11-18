@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% from "common/_macros.html" import header, alert %}
+{% block title %}Revenue report{% endblock %}
+{% block content %}
+{{ header('Revenue report', 'Payments received minus refunds, by ' ~ group) }}
+{% set endpoint = 'admin.revenue' %}{% include "admin/_report_form.html" %}
+{{ alert(error) }}
+{% if rep %}
+<div class="cols c3 mt"><div class="panel kpi"><small>Payments</small><b>{{ rep.total.payments|vnd }}</b></div><div class="panel kpi"><small>Refunds</small><b>{{ rep.total.refunds|vnd }}</b></div><div class="panel kpi"><small>Net revenue</small><b>{{ rep.total.net|vnd }}</b></div></div>
+{% if rep.empty %}<div class="panel empty mt"><b>No revenue in this period</b>Try a wider date range. <span class="hint">({{ mcode('NO_DATA') }})</span></div>
+{% else %}
+{% if rep.rows|length <= 31 %}<div class="panel mt"><div class="panel-h"><h3>Net revenue by {{ group }}</h3></div><div class="panel-b"><div class="bars n" style="--n:{{ rep.rows|length }};height:220px">
+  {% for r in rep.rows %}<div class="bar"><i style="height:{{ [((r.net / peak * 100) if r.net > 0 else 0), 1]|max|round|int }}%" title="{{ r.label }}: {{ r.net|vnd }}"></i></div>{% endfor %}</div>
+  <div class="hint" style="display:flex;justify-content:space-between;padding:6px 12px 0"><span>{{ rep.rows[0].label }}</span><span>{{ rep.rows[-1].label }}</span></div></div></div>{% endif %}
+<div class="panel mt"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>{{ 'Month' if group == 'month' else 'Date' }}</th><th class="r">Payments</th><th class="r">Refunds</th><th class="r">Net</th></tr></thead><tbody>
+  {% for r in rep.rows %}<tr><td class="num">{{ r.label }}</td><td class="r num">{{ r.payments|vnd }}</td><td class="r num">{{ r.refunds|vnd }}</td><td class="r num"><b>{{ r.net|vnd }}</b></td></tr>{% endfor %}
+  <tr><td><b>Total</b></td><td class="r num"><b>{{ rep.total.payments|vnd }}</b></td><td class="r num"><b>{{ rep.total.refunds|vnd }}</b></td><td class="r num"><b>{{ rep.total.net|vnd }}</b></td></tr></tbody></table></div></div>
+<div class="panel mt"><div class="panel-h"><h3>By room type</h3></div><div class="tbl-wrap"><table class="tbl"><tbody>
+  {% for r in rep.by_type %}<tr><td>{{ r.name }}</td><td class="r num">{{ r.net|vnd }}</td><td class="r num">{{ r.share }}%</td></tr>{% endfor %}</tbody></table></div></div>
+{% endif %}{% endif %}
+{% endblock %}

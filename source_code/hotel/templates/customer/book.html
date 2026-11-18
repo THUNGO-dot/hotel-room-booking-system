@@ -1,0 +1,31 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, csrf, alert, sumrows %}
+{% block title %}Book {{ t.name }}{% endblock %}
+{% block content %}
+<div class="ph compact"><h1>Confirm your booking</h1><p>{{ t.name }}</p></div>
+<div class="cols c2 wide">
+<form method="post" class="panel" novalidate>
+  <div class="panel-h"><h2>Stay details</h2></div>
+  <div class="panel-b stack tight">{{ csrf() }}
+    <div class="cols c2" style="gap:12px">
+      <label class="field"><span>Check-in</span><input class="input" type="date" name="ci" value="{{ q.ci }}" min="{{ today_iso() }}" required></label>
+      <label class="field"><span>Check-out</span><input class="input" type="date" name="co" value="{{ q.co }}" required></label>
+      <label class="field"><span>Adults</span><select class="input" name="adults">{% for n in range(1, 7) %}<option value="{{ n }}"{% if n == q.adults %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
+      <label class="field"><span>Children</span><select class="input" name="children">{% for n in range(0, 5) %}<option value="{{ n }}"{% if n == q.children %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
+    </div>
+    <label class="field"><span>Special requests (optional)</span><textarea class="input" name="note" rows="2" maxlength="200" placeholder="Late arrival, extra pillows, quiet floor">{{ q.note }}</textarea></label>
+    {{ alert(error) }}
+    {% if summary and summary.capacity_error and not error %}{{ alert(summary.capacity_error) }}{% endif %}
+    {% if summary and summary.left <= 0 and not error %}<div class="alert bad">{{ icon('warn') }}<div>No rooms of this type are left for these dates. <span class="hint">({{ mcode('NO_ROOM') }})</span></div></div>{% endif %}
+    <div class="row"><a class="btn ghost" href="{{ url_for('public.room_detail', type_id=t.room_type_id, ci=q.ci, co=q.co, adults=q.adults, children=q.children) }}">Back</a>
+      <button class="btn" {% if not summary or summary.left <= 0 or summary.capacity_error %}disabled{% endif %}>Create booking and pay</button></div>
+  </div>
+</form>
+<div class="panel"><div class="panel-h"><h3>Summary</h3></div><div class="panel-b stack tight">
+  {% if summary %}
+  {{ sumrows([(q.ci|dmy ~ ' to ' ~ q.co|dmy, summary.nights ~ ' night' ~ ('' if summary.nights == 1 else 's')), ('Room total', summary.total|vnd), (((cfg.deposit_rate * 100)|round|int) ~ '% deposit, rounded to ' ~ ('{:,}'.format(cfg.deposit_rounding)), summary.deposit|vnd), ('Balance at check-out', (summary.total - summary.deposit)|vnd)], ('Deposit due now', summary.deposit|vnd)) }}
+  {% else %}<p class="hint">Choose valid dates to see the price.</p>{% endif %}
+  <p class="hint">{{ icon('info','sm') }} The room is held for {{ cfg.hold_hours }} hours. VAT {{ (cfg.vat_rate * 100)|round|int }}% is added to the final invoice at check-out.</p>
+  <p class="hint">Booked as <b>{{ user.full_name }}</b>, {{ user.phone }}.</p>
+</div></div>
+</div>
+{% endblock %}

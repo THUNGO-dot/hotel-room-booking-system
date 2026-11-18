@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% from "common/_macros.html" import header, alert %}
+{% block title %}Occupancy report{% endblock %}
+{% block content %}
+{{ header('Occupancy report', 'Share of room-nights used, by ' ~ group ~ '. Future days are not counted.') }}
+{% set endpoint = 'admin.occupancy' %}{% include "admin/_report_form.html" %}
+{{ alert(error) }}
+{% if rep %}
+<div class="cols c3 mt"><div class="panel kpi"><small>Occupancy</small><b>{{ rep.total.rate }}%</b></div><div class="panel kpi"><small>Room-nights used</small><b>{{ rep.total.nights|num }}</b></div><div class="panel kpi"><small>Room-nights available</small><b>{{ rep.total.capacity|num }}</b><span>{{ rep.total.rooms }} rooms in service</span></div></div>
+{% if rep.empty %}<div class="panel empty mt"><b>No stays in this period</b>Try a wider date range. <span class="hint">({{ mcode('NO_DATA') }})</span></div>
+{% else %}
+{% if rep.rows|length <= 31 %}<div class="panel mt"><div class="panel-h"><h3>Occupancy by {{ group }}</h3></div><div class="panel-b"><div class="bars n" style="--n:{{ rep.rows|length }};height:220px">
+  {% for r in rep.rows %}<div class="bar"><i style="height:{{ [r.rate, 1]|max|round|int }}%" title="{{ r.label }}: {{ r.rate }}%"></i></div>{% endfor %}</div>
+  <div class="hint" style="display:flex;justify-content:space-between;padding:6px 12px 0"><span>{{ rep.rows[0].label }}</span><span>{{ rep.rows[-1].label }}</span></div></div></div>{% endif %}
+<div class="panel mt"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>{{ 'Month' if group == 'month' else 'Date' }}</th><th class="r">Room-nights used</th><th class="r">Available</th><th class="r">Occupancy</th></tr></thead><tbody>
+  {% for r in rep.rows %}<tr><td class="num">{{ r.label }}</td><td class="r num">{{ r.nights }}</td><td class="r num">{{ r.capacity }}</td><td class="r num"><b>{{ r.rate }}%</b></td></tr>{% endfor %}
+  <tr><td><b>Total</b></td><td class="r num"><b>{{ rep.total.nights }}</b></td><td class="r num"><b>{{ rep.total.capacity }}</b></td><td class="r num"><b>{{ rep.total.rate }}%</b></td></tr></tbody></table></div></div>
+{% endif %}{% endif %}
+{% endblock %}

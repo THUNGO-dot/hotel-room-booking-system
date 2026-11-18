@@ -1,0 +1,50 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, alert %}
+{% block title %}Find a room{% endblock %}
+{% block content %}
+<section class="hero mt">{{ HERO }}<h2>Find a room that fits your stay</h2><p>Compare room types, see the total for your dates, and hold a room with a {{ (cfg.deposit_rate * 100)|round|int }}% deposit.</p></section>
+<form class="searchbar" method="get" action="{{ url_for('public.home') }}" novalidate>
+  <label class="field"><span>Check-in</span><input class="input" type="date" name="ci" min="{{ min_date }}" value="{{ q.ci }}"></label>
+  <label class="field"><span>Check-out</span><input class="input" type="date" name="co" value="{{ q.co }}"></label>
+  <label class="field"><span>Adults</span><select class="input" name="adults">{% for n in range(1, 7) %}<option value="{{ n }}"{% if n == q.adults %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
+  <label class="field"><span>Children</span><select class="input" name="children">{% for n in range(0, 5) %}<option value="{{ n }}"{% if n == q.children %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
+  <label class="field"><span>Room type</span><select class="input" name="type"><option value="any">Any type</option>{% for t in types %}<option value="{{ t.room_type_id }}"{% if q.type|string == t.room_type_id|string %} selected{% endif %}>{{ t.name }}</option>{% endfor %}</select></label>
+  <button class="btn sun lg">{{ icon('search') }}Search</button>
+  {% if error %}<div class="err" role="alert">{{ icon('warn','sm') }}{{ error.message }} <span class="hint">({{ error.code }})</span></div>{% endif %}
+</form>
+
+{% if error %}
+<div class="panel empty" style="margin-top:44px"><b>Check your dates</b>{{ error.message }}</div>
+{% else %}
+<div class="results-h"><h3>{{ results|length }} room type{{ '' if results|length == 1 else 's' }} for {{ nights }} night{{ '' if nights == 1 else 's' }}, {{ party }} guest{{ '' if party == 1 else 's' }}</h3>
+  <form method="get" class="row" action="{{ url_for('public.home') }}">
+    {% for k in ['ci','co','adults','children','type'] %}<input type="hidden" name="{{ k }}" value="{{ q[k] }}">{% endfor %}
+    <label class="row hint"><span>Price</span><select class="input" style="width:auto;height:38px" name="price" data-autosubmit>
+      <option value="any"{% if q.price == 'any' %} selected{% endif %}>Any</option><option value="lo"{% if q.price == 'lo' %} selected{% endif %}>Under 1,000,000 VND</option><option value="hi"{% if q.price == 'hi' %} selected{% endif %}>1,000,000 VND and up</option></select></label>
+    <label class="row hint"><span>Sort by</span><select class="input" style="width:auto;height:38px" name="sort" data-autosubmit>
+      <option value="asc"{% if q.sort == 'asc' %} selected{% endif %}>Price, low to high</option><option value="desc"{% if q.sort == 'desc' %} selected{% endif %}>Price, high to low</option></select></label>
+    <noscript><button class="btn ghost sm">Apply</button></noscript>
+  </form>
+</div>
+{% if party > max_cap %}<div class="alert bad" role="alert">{{ icon('warn') }}<div><b>No single room sleeps {{ party }} guests</b> Our largest room sleeps {{ max_cap }}. Reduce the number of guests or make two separate bookings.</div></div>{% endif %}
+{% if results %}
+<div class="rooms">
+{% for r in results %}{% set t = r.type %}
+  <article class="room">
+    <div class="photo {{ '' if r.left > 0 else 'sold' }}">{{ room_art(t.name, t.room_type_id) }}<span class="tag {{ 'out' if r.left <= 0 else ('low' if r.left <= 2 else '') }}">{{ 'Sold out' if r.left <= 0 else (r.left ~ ' room' ~ ('' if r.left == 1 else 's') ~ ' left') }}</span></div>
+    <div class="room-b"><h4>{{ t.name }}</h4>
+      <div class="meta"><span>{{ icon('bed','sm') }}{{ t.bed_type }}</span><span>{{ icon('guests','sm') }}Up to {{ t.capacity }}</span><span>{{ icon('expand','sm') }}{{ t.area_m2 }} m²</span></div>
+      <div class="chips">{% for a in r.amenities %}<span class="chip">{{ a }}</span>{% endfor %}</div>
+      {% if r.capacity_error %}<div class="err" role="alert">{{ icon('warn','sm') }}<span>{{ r.capacity_error }}</span></div>{% elif r.left <= 0 %}<div class="err" role="alert">{{ icon('warn','sm') }}<span>No rooms left for these dates. Try other dates.</span></div>{% endif %}
+      <div class="price-row"><div><small>Total for {{ r.nights }} night{{ '' if r.nights == 1 else 's' }}</small><b>{{ r.total|vnd }}</b><em>{{ r.nightly|vnd }} per night</em>
+        <em class="dep">Deposit today ({{ (cfg.deposit_rate * 100)|round|int }}%): <b>{{ r.deposit|vnd }}</b></em></div>
+        <div class="row"><a class="btn ghost sm" href="{{ url_for('public.room_detail', type_id=t.room_type_id, ci=q.ci, co=q.co, adults=q.adults, children=q.children) }}">Details</a>
+          {% if user and user.role != 'CUSTOMER' %}{% elif r.can_book %}<a class="btn sm" href="{{ url_for('public.book', type_id=t.room_type_id, ci=q.ci, co=q.co, adults=q.adults, children=q.children) }}">Book now</a>{% else %}<span class="btn sm" aria-disabled="true" style="opacity:.45;cursor:not-allowed">Book now</span>{% endif %}</div></div>
+    </div>
+  </article>
+{% endfor %}
+</div>
+{% else %}
+<div class="panel empty"><b>No room matches these filters</b>Try “Any type” or a different price range. <span class="hint">({{ mcode('NO_MATCH') }})</span></div>
+{% endif %}
+{% endif %}
+{% endblock %}

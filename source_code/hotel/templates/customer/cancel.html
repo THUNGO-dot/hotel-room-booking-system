@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, csrf, sumrows %}
+{% block title %}Cancel booking{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('public.booking_detail', code=b.booking_code) }}">← Back to booking</a></p><h1>Cancel booking</h1><p>{{ b.booking_code }}, {{ b.type_name }}, {{ b.check_in_date|dmy }} to {{ b.check_out_date|dmy }}</p></div>
+<div class="panel" style="max-width:640px"><div class="panel-b stack tight">
+  <div class="alert {{ 'ok' if prev.rate == 100 else ('warn' if prev.rate else 'bad') }}">{{ icon('info') }}<div><b>{{ prev.rate }}% refund.</b> Check-in is in {{ prev.hours }} hours.
+    {% if not prev.paid %}You have not paid a deposit, so nothing is refunded and the room is simply released.{% endif %}</div></div>
+  {{ sumrows([('Deposit paid', prev.paid|vnd), ('Refund rate', prev.rate ~ '%')], ('Refund', prev.amount|vnd)) }}
+  <p class="hint">{{ cfg.refund_full_hours }} hours or more before check-in: 100%. {{ cfg.refund_half_hours }} to {{ cfg.refund_full_hours }} hours: {{ cfg.refund_half_rate }}%. Under {{ cfg.refund_half_hours }} hours: no refund. Refunds are returned to the original payment method.</p>
+  <form method="post" class="row" data-confirm="Cancel booking {{ b.booking_code }}? This cannot be undone.">{{ csrf() }}
+    <a class="btn ghost" href="{{ url_for('public.booking_detail', code=b.booking_code) }}">Keep my booking</a><button class="btn bad">Cancel booking</button></form>
+</div></div>
+{% endblock %}

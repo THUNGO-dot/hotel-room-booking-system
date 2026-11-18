@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field, sumrows %}
+{% block title %}Check in {{ b.guest_name }}{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('desk.checkin_list') }}">← Arrivals</a></p><h1>Check in {{ b.guest_name }}</h1><p>{{ b.booking_code }}, {{ b.type_name }}</p></div>
+<div class="cols c2 wide">
+<form method="post" class="panel" novalidate><div class="panel-h"><h2>Guest arrival</h2></div><div class="panel-b stack tight">{{ csrf() }}
+  {{ field('id_document', 'ID or passport number', f.get('id_document'), 'text', True, 'maxlength="30" autocomplete="off" autofocus', 'Stored only for the stay. Shown to staff only.') }}
+  <label class="field"><span>Room</span><select class="input" name="room" required><option value="">Choose a free {{ b.type_name }} room</option>
+    {% for r in rooms %}<option value="{{ r.room_id }}"{% if f.get('room')|string == r.room_id|string %} selected{% endif %}>Room {{ r.room_number }}, floor {{ r.floor }}</option>{% endfor %}</select></label>
+  {% if not rooms %}<div class="alert bad"><div>No clean room of this type is free right now. Mark a cleaned room as Available on the Rooms screen, then come back. <span class="hint">({{ mcode('NO_ROOM_CHECKIN') }})</span></div></div>{% endif %}
+  {{ alert(error) }}
+  <div class="row"><button class="btn" {% if not rooms %}disabled{% endif %}>Complete check-in</button><a class="btn ghost" href="{{ url_for('desk.checkin_list') }}">Cancel</a></div>
+</div></form>
+<div class="panel"><div class="panel-h"><h3>Booking</h3></div><div class="panel-b">
+  {{ sumrows([('Stay', (b.check_in_date|dmy) ~ ' to ' ~ (b.check_out_date|dmy)), ('Guests', b.guests), ('Phone', b.guest_phone), ('Room total', b.room_charge|vnd), ('Deposit paid', b.paid|vnd)], ('Balance', (b.room_charge - b.paid)|vnd)) }}
+  {% if b.special_request %}<p class="hint mt-s">Request: {{ b.special_request }}</p>{% endif %}</div></div>
+</div>
+{% endblock %}

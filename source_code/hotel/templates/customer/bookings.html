@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, booking_pill, pager, header %}
+{% block title %}My bookings{% endblock %}
+{% block content %}
+{{ header('My bookings', 'Track, pay for, change or cancel your reservations') }}
+<div class="row" style="justify-content:space-between;margin-bottom:16px">
+  <div class="tabs" role="group" aria-label="Filter bookings">{% for k, l in [('all','All'),('active','Active'),('completed','Completed'),('cancelled','Cancelled')] %}<a href="{{ url_for('public.booking_list', tab=k) }}" class="{{ 'on' if tab == k }}">{{ l }}</a>{% endfor %}</div>
+  <a class="btn" href="{{ url_for('public.home') }}">{{ icon('plus','sm') }}New booking</a></div>
+<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Booking</th><th>Room type</th><th>Stay</th><th class="r">Total</th><th>Status</th><th class="r">Actions</th></tr></thead><tbody>
+{% for b in p.items %}{% set n = ((b.check_out_date|dmy) and (b.check_out_date[8:10]|int - b.check_in_date[8:10]|int)) %}
+<tr><td><span class="code">{{ b.booking_code }}</span>{% if b.status == 'PENDING' and b.paid < b.deposit_amount %}<div class="hint">Pay by {{ b.hold_expires_at|dmyhm }}</div>{% endif %}</td>
+  <td>{{ b.type_name }}</td><td class="num">{{ b.check_in_date|dmy }} to {{ b.check_out_date|dmy }}<div class="hint">{{ b.guests }} guest{{ '' if b.guests == 1 else 's' }}</div></td>
+  <td class="r num"><b>{{ b.room_charge|vnd }}</b></td><td>{{ booking_pill(b) }}</td>
+  <td class="r"><div class="row end">{% if b.status == 'PENDING' and b.paid < b.deposit_amount %}<a class="btn sm" href="{{ url_for('public.pay', code=b.booking_code) }}">Pay deposit</a>{% endif %}
+    <a class="btn ghost sm" href="{{ url_for('public.booking_detail', code=b.booking_code) }}">Details</a></div></td></tr>
+{% else %}<tr><td colspan="6"><div class="empty"><b>No bookings here yet</b>Find a room and your booking will appear in this list.</div></td></tr>{% endfor %}
+</tbody></table></div>{{ pager(p) }}</div>
+<p class="hint mt-s">A booking whose deposit is not paid within {{ cfg.hold_hours }} hours is released automatically.</p>
+{% endblock %}

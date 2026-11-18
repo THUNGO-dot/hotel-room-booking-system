@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, sumrows %}
+{% block title %}Services for room {{ b.room_number }}{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('desk.inhouse') }}">← In-house guests</a></p><h1>Services, room {{ b.room_number }}</h1><p>{{ b.guest_name }}, {{ b.booking_code }}</p></div>
+<div class="cols c2 wide">
+<div class="stack">
+<form method="post" class="panel" novalidate><div class="panel-h"><h3>Add a service</h3></div><div class="panel-b stack tight">{{ csrf() }}
+  <div class="cols c2" style="gap:12px"><label class="field"><span>Service</span><select class="input" name="service" required><option value="">Choose</option>
+    {% for s in catalog %}<option value="{{ s.service_id }}">{{ s.name }}, {{ s.unit_price|vnd }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Quantity</span><input class="input" type="number" name="quantity" value="1" min="1" max="99"></label></div>
+  {{ alert(error) }}<div class="row"><button class="btn">Add to bill</button></div></div></form>
+<div class="panel"><div class="panel-h"><h3>Used so far</h3></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Service</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Amount</th><th>When</th></tr></thead><tbody>
+{% for u in lines %}<tr><td>{{ u.name }}</td><td class="r num">{{ u.quantity }}</td><td class="r num">{{ u.unit_price|vnd }}</td><td class="r num">{{ (u.quantity * u.unit_price)|vnd }}</td><td class="num">{{ u.used_at|dmyhm }}</td></tr>
+{% else %}<tr><td colspan="5"><div class="empty"><b>No services yet</b></div></td></tr>{% endfor %}</tbody></table></div></div>
+</div>
+<div class="panel"><div class="panel-h"><h3>Bill so far</h3></div><div class="panel-b stack tight">
+  {{ sumrows([('Room, ' ~ bill.nights ~ ' night' ~ ('' if bill.nights == 1 else 's'), bill.room_charge|vnd), ('Services', bill.service_charge|vnd), ('VAT ' ~ ((cfg.vat_rate * 100)|round|int) ~ '%', bill.vat|vnd), ('Paid', bill.paid|vnd)], ('Balance', bill.balance|vnd)) }}
+  <a class="btn block" href="{{ url_for('desk.checkout', code=b.booking_code) }}">Go to check-out</a></div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, header, booking_pill, act %}
+{% block title %}Front desk{% endblock %}
+{% block content %}
+{{ header('Front desk', 'Today, ' ~ (today_iso()|dmy)) }}
+<div class="cols c4">
+  <a class="panel kpi" href="{{ url_for('desk.pending') }}"><small>Pending bookings</small><b>{{ counts.pending }}</b><span>Waiting for confirmation</span></a>
+  <a class="panel kpi" href="{{ url_for('desk.checkin_list') }}"><small>Arrivals today</small><b>{{ counts.arrivals }}</b><span>Ready to check in</span></a>
+  <a class="panel kpi" href="{{ url_for('desk.inhouse') }}"><small>Guests in house</small><b>{{ counts.inhouse }}</b><span>Check-out and services</span></a>
+  <a class="panel kpi" href="{{ url_for('desk.rooms') }}"><small>Rooms available</small><b>{{ counts.rooms_free }}</b><span>Clean and ready</span></a>
+</div>
+<div class="row mt"><a class="btn" href="{{ url_for('desk.walkin') }}">{{ icon('plus','sm') }}Walk-in guest</a><a class="btn ghost" href="{{ url_for('desk.search') }}">Find a booking</a></div>
+<div class="cols c2 mt">
+  <div class="panel"><div class="panel-h"><h3>Next to confirm</h3><a class="link" href="{{ url_for('desk.pending') }}">See all</a></div>
+    {% for b in pending %}<div class="pend"><div><b>{{ b.booking_code }}</b><small>{{ b.guest_name }}, {{ b.type_name }}, {{ b.check_in_date|dmy }} to {{ b.check_out_date|dmy }}</small></div>{{ booking_pill(b) }}</div>
+    {% else %}<div class="empty"><b>Nothing waiting</b>New bookings appear here.</div>{% endfor %}</div>
+  <div class="panel"><div class="panel-h"><h3>Arrivals</h3><a class="link" href="{{ url_for('desk.checkin_list') }}">See all</a></div>
+    {% for b in arrivals %}<div class="pend"><div><b>{{ b.guest_name }}</b><small>{{ b.booking_code }}, {{ b.type_name }}, until {{ b.check_out_date|dmy }}</small></div><a class="btn sm" href="{{ url_for('desk.checkin_form', code=b.booking_code) }}">Check in</a></div>
+    {% else %}<div class="empty"><b>No arrivals waiting</b>Confirmed guests arriving today show here.</div>{% endfor %}</div>
+</div>
+{% endblock %}

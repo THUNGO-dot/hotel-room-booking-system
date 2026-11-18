@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+<div class="panel auth"><div class="panel-h"><h2>Create an account</h2></div><div class="panel-b">
+  {% set active = 'register' %}{% include "auth/_tabs.html" %}
+  <form method="post" class="stack tight" novalidate>
+    {{ csrf() }}<input type="hidden" name="next" value="{{ next }}">
+    {{ field('name', 'Full name', f.get('name'), 'text', True, 'autocomplete="name"') }}
+    {{ field('email', 'Email', f.get('email'), 'email', True, 'autocomplete="email"', 'You use it to sign in.') }}
+    {{ field('phone', 'Phone number', f.get('phone'), 'tel', True, 'autocomplete="tel"') }}
+    {{ field('password', 'Password', '', 'password', True, 'autocomplete="new-password"', 'At least ' ~ cfg.min_password_length ~ ' characters.') }}
+    {{ alert(error) }}
+    <button class="btn lg block">Create account</button>
+  </form>
+</div></div>
+{% endblock %}

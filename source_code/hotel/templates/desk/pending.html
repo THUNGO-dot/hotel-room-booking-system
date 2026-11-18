@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, csrf, header, booking_pill, pager, act %}
+{% block title %}Pending bookings{% endblock %}
+{% block content %}
+{{ header('Pending bookings', 'Confirm or reject new bookings. A booking can be confirmed once its deposit is paid.') }}
+<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Booking</th><th>Guest</th><th>Room and stay</th><th class="r">Deposit</th><th class="r">Actions</th></tr></thead><tbody>
+{% for b in p.items %}{% set paid_ok = b.paid >= b.deposit_amount %}
+<tr><td class="nw"><span class="code">{{ b.booking_code }}</span><div style="margin-top:6px">{{ booking_pill(b) }}</div></td>
+  <td class="nw">{{ b.guest_name }}<div class="hint">{{ b.guest_phone }}</div></td>
+  <td class="nw">{{ b.type_name }}<div class="hint">{{ b.check_in_date|dmy }} to {{ b.check_out_date|dmy }}</div></td>
+  <td class="r num">{{ b.paid|vnd }}<div class="hint">of {{ b.deposit_amount|vnd }}</div></td>
+  <td class="r"><div class="row end" style="align-items:flex-start">
+    {% if paid_ok %}{{ act(url_for('desk.confirm', code=b.booking_code), 'Confirm', 'btn sm') }}
+    {% else %}{{ act(url_for('desk.record_deposit', code=b.booking_code), 'Record deposit', 'btn sm', 'Record a cash deposit of ' ~ ((b.deposit_amount - b.paid)|vnd) ~ ' for ' ~ b.booking_code ~ '?', {'method': 'CASH'}) }}{% endif %}
+    <details class="reject"><summary class="btn ghost sm">Reject</summary>
+      <form method="post" action="{{ url_for('desk.reject', code=b.booking_code) }}">{{ csrf() }}
+        <label class="field"><span>Reason for the guest</span><input class="input" name="reason" maxlength="200" required></label><button class="btn bad sm">Reject booking</button></form></details>
+  </div></td></tr>
+{% else %}<tr><td colspan="5"><div class="empty"><b>No pending bookings</b>You are all caught up.</div></td></tr>{% endfor %}
+</tbody></table></div>{{ pager(p) }}</div>
+
+<div class="sec-row"><h2 class="sec-h">Refunds to pay out</h2></div>
+<div class="panel">{% for r in refunds %}<div class="pend"><div><b>{{ r.booking_code }}, {{ r.guest_name }}</b><small>{{ r.refund_rate }}% refund of the deposit. {{ r.reason }}</small></div>
+  <div class="row"><b class="num">{{ r.amount|vnd }}</b>{{ act(url_for('desk.complete_refund', refund_id=r.refund_id), 'Mark as refunded', 'btn sm', 'Confirm that ' ~ (r.amount|vnd) ~ ' was returned to ' ~ r.guest_name ~ '?') }}</div></div>
+{% else %}<div class="empty"><b>No refunds waiting</b>Cancelled and rejected bookings with a deposit show here.</div>{% endfor %}</div>
+{% endblock %}

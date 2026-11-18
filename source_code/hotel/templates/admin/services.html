@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field, header, act %}
+{% block title %}Add-on services{% endblock %}
+{% block content %}
+{{ header('Add-on services', 'Services the front desk can add to a guest bill. Bills keep the price they were charged at.') }}
+<div class="cols c2 wide">
+<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Service</th><th class="r">Price</th><th class="r">Actions</th></tr></thead><tbody>
+{% for s in rows %}<tr><td>{{ s.name }}</td><td class="r num">{{ s.unit_price|vnd }}</td><td class="r"><div class="row end"><a class="btn ghost sm" href="{{ url_for('admin.services', edit=s.service_id) }}">Edit</a>{{ act(url_for('admin.service_remove', service_id=s.service_id), 'Remove', 'btn ghost sm', 'Remove ' ~ s.name ~ ' from the list?') }}</div></td></tr>
+{% else %}<tr><td colspan="3"><div class="empty"><b>No services yet</b></div></td></tr>{% endfor %}</tbody></table></div></div>
+<form method="post" class="panel" novalidate><div class="panel-h"><h3>{{ 'Edit service' if editing else 'Add service' }}</h3></div><div class="panel-b stack tight">{{ csrf() }}
+  {% if editing %}<input type="hidden" name="service_id" value="{{ editing.service_id }}">{% endif %}
+  {{ field('name', 'Name', f.get('name', editing.name if editing else ''), 'text', True, 'maxlength="50"') }}
+  {{ field('price', 'Price (VND)', f.get('price', editing.unit_price|int if editing else ''), 'number', True, 'min="1" step="1000"') }}
+  {{ alert(error) }}
+  <div class="row"><button class="btn">Save service</button>{% if editing %}<a class="btn ghost" href="{{ url_for('admin.services') }}">Cancel edit</a>{% endif %}</div>
+</div></form>
+</div>
+{% endblock %}

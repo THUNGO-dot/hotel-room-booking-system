@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert %}
+{% block title %}Change room{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('desk.inhouse') }}">← In-house guests</a></p><h1>Change room</h1><p>{{ b.guest_name }}, {{ b.booking_code }}, now in room {{ b.room_number }}</p></div>
+<form method="post" class="panel" style="max-width:560px" novalidate><div class="panel-b stack tight">{{ csrf() }}
+  <label class="field"><span>New room ({{ b.type_name }})</span><select class="input" name="room" required><option value="">Choose a free room</option>
+    {% for r in rooms %}<option value="{{ r.room_id }}">Room {{ r.room_number }}, floor {{ r.floor }}</option>{% endfor %}</select></label>
+  {% if not rooms %}<div class="alert bad"><div>No other free room of this type. <span class="hint">({{ mcode('NO_ROOM_CHECKIN') }})</span></div></div>{% endif %}
+  {{ alert(error) }}
+  <div class="row"><button class="btn" {% if not rooms %}disabled{% endif %}>Move guest</button><a class="btn ghost" href="{{ url_for('desk.inhouse') }}">Cancel</a></div>
+  <p class="hint">The room the guest leaves is marked Cleaning.</p>
+</div></form>
+{% endblock %}

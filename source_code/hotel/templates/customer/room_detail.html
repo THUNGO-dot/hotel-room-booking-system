@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, alert, sumrows %}
+{% block title %}{{ t.name }}{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('public.home', ci=q.ci, co=q.co, adults=q.adults, children=q.children, type=q.type) }}">← Back to results</a></p><h1>{{ t.name }}</h1></div>
+<div class="cols c2 wide">
+  <div class="panel"><div class="photo" style="height:340px">{{ room_art(t.name, t.room_type_id) }}</div>
+    <div class="panel-b stack tight">
+      <p>{{ t.description }}</p>
+      <div class="meta"><span>{{ icon('bed','sm') }}{{ t.bed_type }}</span><span>{{ icon('guests','sm') }}Up to {{ t.capacity }} guests</span><span>{{ icon('expand','sm') }}{{ t.area_m2 }} m²</span></div>
+      <div class="chips">{% for a in amenities %}<span class="chip">{{ a }}</span>{% endfor %}</div>
+    </div></div>
+  <div class="stack">
+    <div class="panel"><div class="panel-h"><h3>Your stay</h3></div><div class="panel-b stack tight">
+      {% if info %}
+        {{ sumrows([('Dates', (q.ci|dmy) ~ ' to ' ~ (q.co|dmy)), ('Nights', info.nights), ('Average per night', info.nightly|vnd), ('Rooms left', info.left)], ('Room total', info.total|vnd)) }}
+        <p class="hint">Deposit today ({{ (cfg.deposit_rate * 100)|round|int }}%): <b>{{ info.deposit|vnd }}</b></p>
+        {{ alert(error) }}
+        {% if info.capacity_error %}<div class="alert bad">{{ icon('warn') }}<div>{{ info.capacity_error }}</div></div>{% endif %}
+        {% if user and user.role != 'CUSTOMER' %}<p class="hint">Staff accounts do not book online. Use the walk-in screen.</p>
+        {% elif info.can_book %}<a class="btn lg block" href="{{ url_for('public.book', type_id=t.room_type_id, ci=q.ci, co=q.co, adults=q.adults, children=q.children) }}">Book now</a>
+        {% else %}<span class="btn lg block" style="opacity:.45">{{ 'Sold out for these dates' if info.left <= 0 else 'Book now' }}</span>{% endif %}
+      {% else %}{{ alert(error) }}{% endif %}
+    </div></div>
+    <div class="panel"><div class="panel-h"><h3>Hotel policy</h3></div><div class="panel-b">
+      {{ sumrows(policy) }}</div></div>
+  </div>
+</div>
+{% endblock %}

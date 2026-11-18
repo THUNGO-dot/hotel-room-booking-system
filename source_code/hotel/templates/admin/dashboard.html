@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% from "common/_macros.html" import header %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+{{ header('Hotel performance', d.label ~ (' (month in progress)' if d.end.isoformat() > today_iso() else '')) }}
+<div class="row" style="justify-content:space-between;margin-bottom:20px">
+  <div class="tabs" role="group" aria-label="Month">{% for v, l in months %}<a href="{{ url_for('admin.dashboard', month=v, metric=metric) }}" class="{{ 'on' if v == current }}">{{ l }}</a>{% endfor %}</div>
+  <div class="row"><a class="btn ghost sm" href="{{ url_for('admin.revenue', start=d.start.isoformat(), end=d.end.isoformat(), group='day') }}">Revenue report</a><a class="btn ghost sm" href="{{ url_for('admin.occupancy', start=d.start.isoformat(), end=d.end.isoformat(), group='day') }}">Occupancy report</a></div></div>
+<div class="cols c3">
+  <div class="panel kpi"><small>Net revenue</small><b>{{ d.revenue.net|vnd }}</b><span>Payments {{ d.revenue.payments|vnd }}, refunds {{ d.revenue.refunds|vnd }}</span></div>
+  <div class="panel kpi"><small>Occupancy</small><b>{{ d.occupancy.rate }}%</b><span>{{ d.occupancy.nights }} of {{ d.occupancy.capacity }} room-nights, {{ d.occupancy.rooms }} rooms</span></div>
+  <div class="panel kpi"><small>Against previous month</small><b>{% if d.change is none %}n/a{% else %}{{ '+' if d.change > 0 }}{{ d.change }}%{% endif %}</b><span>{{ 'Shown once the month is finished' if d.change is none else 'Net revenue change' }}</span></div>
+</div>
+<div class="cols c2 wide mt">
+  <div class="panel"><div class="panel-h"><h3>{{ 'Revenue' if metric == 'rev' else 'Occupancy' }} by week</h3>
+    <div class="tabs"><a href="{{ url_for('admin.dashboard', month=current, metric='rev') }}" class="{{ 'on' if metric == 'rev' }}">Revenue</a><a href="{{ url_for('admin.dashboard', month=current, metric='occ') }}" class="{{ 'on' if metric == 'occ' }}">Occupancy</a></div></div>
+    <div class="panel-b"><div class="bars n" style="--n:{{ d.weeks|length }}">
+      {% for w in d.weeks %}{% set h = (w.revenue / peak * 100) if metric == 'rev' else w.occupancy %}
+      <div class="bar"><b>{{ (w.revenue / 1000000)|round(1) ~ 'M' if metric == 'rev' else w.occupancy ~ '%' }}</b><i style="height:{{ [h, 2]|max|round|int }}%"></i><span>{{ w.label }}</span></div>{% endfor %}</div></div></div>
+  <div class="panel"><div class="panel-h"><h3>Revenue by room type</h3></div><div class="tbl-wrap"><table class="tbl"><tbody>
+    {% for r in d.by_type %}<tr><td>{{ r.name }}</td><td class="r num">{{ r.net|vnd }}</td><td class="r num">{{ r.share }}%</td></tr>
+    {% else %}<tr><td><div class="empty"><b>No revenue yet</b></div></td></tr>{% endfor %}</tbody></table></div></div>
+</div>
+{% endblock %}

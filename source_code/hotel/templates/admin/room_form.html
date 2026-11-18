@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field %}
+{% block title %}{{ 'Edit room ' ~ room.room_number if room else 'Add room' }}{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('admin.rooms') }}">← Rooms</a></p><h1>{{ 'Edit room ' ~ room.room_number if room else 'Add room' }}</h1></div>
+<form method="post" class="panel" style="max-width:560px" novalidate><div class="panel-b stack tight">{{ csrf() }}
+  {{ field('number', 'Room number', v.get('number'), 'text', True, 'maxlength="10"') }}
+  <label class="field"><span>Room type</span><select class="input" name="type" required>{% for t in types %}<option value="{{ t.room_type_id }}"{% if v.get('type')|string == t.room_type_id|string %} selected{% endif %}>{{ t.name }}</option>{% endfor %}</select></label>
+  {{ field('floor', 'Floor', v.get('floor'), 'number', True, 'min="0" max="99"') }}
+  <label class="field"><span>Status</span><select class="input" name="status">{% for val, l in statuses %}<option value="{{ val }}"{% if v.get('status') == val %} selected{% endif %}>{{ l }}</option>{% endfor %}</select></label>
+  {{ alert(error) }}
+  <div class="row"><button class="btn">Save room</button><a class="btn ghost" href="{{ url_for('admin.rooms') }}">Cancel</a></div>
+  <p class="hint">Taking a room out of service is refused when future bookings would then have no room. <span>(BR-30)</span></p>
+</div></form>
+{% endblock %}

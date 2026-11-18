@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field, header %}
+{% block title %}Walk-in guest{% endblock %}
+{% block content %}
+{{ header('Walk-in guest', 'Book a room for a guest at the desk. The stay starts today and is confirmed at once.') }}
+<form method="post" class="panel" style="max-width:640px" novalidate><div class="panel-b stack tight">{{ csrf() }}
+  {{ field('name', 'Guest full name', f.get('name'), 'text', True) }}
+  {{ field('phone', 'Phone number', f.get('phone'), 'tel', True) }}
+  <label class="field"><span>Room type</span><select class="input" name="type" required><option value="">Choose a room type</option>
+    {% for t in types %}<option value="{{ t.room_type_id }}"{% if f.get('type')|string == t.room_type_id|string %} selected{% endif %}>{{ t.name }}, up to {{ t.capacity }} guests</option>{% endfor %}</select></label>
+  <div class="cols c2" style="gap:12px">
+    <label class="field"><span>Nights</span><input class="input" type="number" name="nights" min="1" max="{{ cfg.max_nights }}" value="{{ f.get('nights', 1) }}" required></label>
+    <label class="field"><span>Guests</span><input class="input" type="number" name="guests" min="1" max="8" value="{{ f.get('guests', 1) }}" required></label></div>
+  {{ alert(error) }}
+  <div class="row"><button class="btn">Create booking</button><a class="btn ghost" href="{{ url_for('desk.dashboard') }}">Cancel</a></div>
+  <p class="hint">Payment is taken at check-out. The room is assigned at check-in.</p>
+</div></form>
+{% endblock %}

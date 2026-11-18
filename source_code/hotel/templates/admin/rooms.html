@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, header, pill, pager, act %}
+{% block title %}Rooms{% endblock %}
+{% block content %}
+{{ header('Rooms', total ~ ' rooms in the hotel') }}
+<div class="row" style="justify-content:flex-end;margin-bottom:16px"><a class="btn" href="{{ url_for('admin.room_form') }}">{{ icon('plus','sm') }}Add room</a></div>
+<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Room</th><th>Type</th><th>Floor</th><th>Status</th><th class="r">Actions</th></tr></thead><tbody>
+{% for r in p.items %}<tr><td><span class="code">{{ r.room_number }}</span></td><td>{{ r.type_name }}</td><td>{{ r.floor }}</td><td>{{ pill(ROOM_STATUS[r.status], r.status|capitalize) }}</td>
+  <td class="r"><div class="row end"><a class="btn ghost sm" href="{{ url_for('admin.room_form', room_id=r.room_id) }}">Edit</a>{{ act(url_for('admin.room_delete', room_id=r.room_id), 'Remove', 'btn ghost sm', 'Remove room ' ~ r.room_number ~ '? Rooms with booking history are only hidden.') }}</div></td></tr>
+{% else %}<tr><td colspan="5"><div class="empty"><b>No rooms yet</b>Add the first room.</div></td></tr>{% endfor %}
+</tbody></table></div>{{ pager(p) }}</div>
+{% endblock %}

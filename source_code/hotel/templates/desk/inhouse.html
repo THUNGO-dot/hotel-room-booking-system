@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% from "common/_macros.html" import header %}
+{% block title %}In-house guests{% endblock %}
+{% block content %}
+{{ header('In-house guests', 'Add services to a guest bill, change rooms and check guests out') }}
+<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Room</th><th>Guest</th><th>Stay</th><th class="r">Bill so far</th><th class="r">Actions</th></tr></thead><tbody>
+{% for b in rows %}{% set bill = bills[b.booking_code] %}
+<tr><td><span class="code">{{ b.room_number }}</span><div class="hint">{{ b.type_name }}</div></td>
+  <td>{{ b.guest_name }}<div class="hint">{{ b.booking_code }}</div></td>
+  <td class="num">{{ b.check_in_date|dmy }} to {{ b.check_out_date|dmy }}</td>
+  <td class="r num"><b>{{ bill.total|vnd }}</b><div class="hint">balance {{ bill.balance|vnd }}</div></td>
+  <td class="r"><div class="row end"><a class="btn ghost sm" href="{{ url_for('desk.services', code=b.booking_code) }}">Services</a><a class="btn ghost sm" href="{{ url_for('desk.change_room', code=b.booking_code) }}">Change room</a><a class="btn sm" href="{{ url_for('desk.checkout', code=b.booking_code) }}">Check out</a></div></td></tr>
+{% else %}<tr><td colspan="5"><div class="empty"><b>No guests in house</b>Guests appear here after check-in.</div></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

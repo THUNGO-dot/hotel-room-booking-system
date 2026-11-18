@@ -1,0 +1,50 @@
+{% macro icon(name, cls='') %}<svg class="ic {{ cls }}" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{% endmacro %}
+
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
+
+{% macro alert(error, kind='bad') %}{% if error %}
+<div class="alert {{ kind }}" role="alert">{{ icon('warn') }}<div>{{ error.message }}{% if error.code %} <span class="hint">({{ error.code }})</span>{% endif %}</div></div>
+{% endif %}{% endmacro %}
+
+{% macro note(kind, title, text='') %}
+<div class="alert {{ kind }}">{{ icon('info') }}<div><b>{{ title }}</b>{% if text %} {{ text }}{% endif %}</div></div>
+{% endmacro %}
+
+{% macro pill(kind, text) %}<span class="pill {{ kind }}">{{ text }}</span>{% endmacro %}
+
+{% macro booking_pill(b) %}{% set s = status_pill(b) %}<span class="pill {{ s[0] }}">{{ s[1] }}</span>{% endmacro %}
+
+{% macro sumrows(rows, total=None) %}
+<div class="sum">{% for k, v in rows %}<div><span>{{ k }}</span><span>{{ v }}</span></div>{% endfor %}
+{% if total %}<div class="t"><span>{{ total[0] }}</span><b>{{ total[1] }}</b></div>{% endif %}</div>
+{% endmacro %}
+
+{% macro field(name, label, value='', type='text', required=False, attrs='', hint='') %}
+<label class="field"><span>{{ label }}</span>
+<input class="input" type="{{ type }}" name="{{ name }}" value="{{ value if value is not none else '' }}"{% if required %} required{% endif %} {{ attrs|safe }}>
+{% if hint %}<small class="hint">{{ hint }}</small>{% endif %}</label>
+{% endmacro %}
+
+{% macro select(name, label, options, value='', attrs='') %}
+<label class="field"><span>{{ label }}</span>
+<select class="input" name="{{ name }}" {{ attrs|safe }}>{% for v, t in options %}<option value="{{ v }}"{% if v|string == value|string %} selected{% endif %}>{{ t }}</option>{% endfor %}</select></label>
+{% endmacro %}
+
+{% macro act(url, label, cls='btn ghost sm', confirm='', fields=None, disabled=False, title='') %}
+<form method="post" action="{{ url }}" class="inline"{% if confirm %} data-confirm="{{ confirm }}"{% endif %}>{{ csrf() }}
+{% for k, v in (fields or {}).items() %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+<button class="{{ cls }}"{% if disabled %} disabled{% endif %}{% if title %} title="{{ title }}"{% endif %}>{{ label }}</button></form>
+{% endmacro %}
+
+{% macro pager(p) %}{% if p.pages > 1 %}
+<div class="pager"><span class="hint">Showing {{ p.first }} to {{ p.last }} of {{ p.total }}</span>
+<div class="row">{% if p.page > 1 %}<a class="btn ghost sm" href="{{ page_url(p.page - 1) }}">Previous</a>{% endif %}
+<span class="hint">Page {{ p.page }} of {{ p.pages }}</span>
+{% if p.page < p.pages %}<a class="btn ghost sm" href="{{ page_url(p.page + 1) }}">Next</a>{% endif %}</div></div>
+{% endif %}{% endmacro %}
+
+{% macro header(title, sub='') %}
+<div class="ph"><h1>{{ title }}</h1>{% if sub %}<p>{{ sub }}</p>{% endif %}</div>
+{% endmacro %}
+
+{% macro empty(title, text='') %}<div class="empty"><b>{{ title }}</b>{{ text }}</div>{% endmacro %}

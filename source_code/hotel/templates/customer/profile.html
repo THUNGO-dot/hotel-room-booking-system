@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field, header %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+{{ header('My profile', 'Update your contact details or change your password') }}
+<form method="post" class="panel" style="max-width:640px" novalidate><div class="panel-b stack tight">{{ csrf() }}
+  <label class="field"><span>Email</span><input class="input" value="{{ user.email }}" disabled><small class="hint">Your email is your sign-in name and cannot be changed.</small></label>
+  {{ field('name', 'Full name', f.get('name', user.full_name), 'text', True) }}
+  {{ field('phone', 'Phone number', f.get('phone', user.phone), 'tel', True) }}
+  <hr style="border:0;border-top:1px solid var(--line)">
+  <b>Change password (optional)</b>
+  {{ field('current', 'Current password', '', 'password', False, 'autocomplete="current-password"') }}
+  {{ field('new', 'New password', '', 'password', False, 'autocomplete="new-password"', 'At least ' ~ cfg.min_password_length ~ ' characters.') }}
+  {{ alert(error) }}
+  <div class="row"><button class="btn">Save changes</button></div>
+</div></form>
+{% endblock %}

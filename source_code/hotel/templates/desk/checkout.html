@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, csrf, alert, sumrows %}
+{% block title %}Check out room {{ b.room_number }}{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('desk.inhouse') }}">← In-house guests</a></p><h1>Check out, room {{ b.room_number }}</h1><p>{{ b.guest_name }}, {{ b.booking_code }}, {{ b.check_in_date|dmy }} to {{ b.check_out_date|dmy }}</p></div>
+<div class="cols c2 wide">
+<div class="panel"><div class="panel-h"><h2>Bill</h2></div><div class="panel-b stack tight">
+  <div class="tbl-wrap"><table class="tbl lines"><tbody>
+    <tr><td>Room, {{ bill.nights }} night{{ '' if bill.nights == 1 else 's' }}</td><td class="r num">{{ bill.room_charge|vnd }}</td></tr>
+    {% for u in bill.lines %}<tr><td>{{ u.name }} × {{ u.quantity }}</td><td class="r num">{{ (u.quantity * u.unit_price)|vnd }}</td></tr>{% endfor %}
+    {% if late %}<tr><td>Late check-out fee (half a night)</td><td class="r num">{{ bill.late_fee|vnd }}</td></tr>{% endif %}</tbody></table></div>
+  {{ sumrows([('Subtotal', bill.subtotal|vnd), ('VAT ' ~ ((cfg.vat_rate * 100)|round|int) ~ '%', bill.vat|vnd), ('Total', bill.total|vnd), ('Already paid', bill.paid|vnd)], ('Balance to collect', bill.balance|vnd) if bill.balance >= 0 else ('Refund to guest', (-bill.balance)|vnd)) }}
+  <form method="get" class="check" action="{{ url_for('desk.checkout', code=b.booking_code) }}"><input type="hidden" name="recalc" value="1">
+    <input type="checkbox" name="late" value="1" id="late-box"{% if late %} checked{% endif %} data-autosubmit><label for="late-box">Guest leaves after {{ cfg.late_checkout_hour }}:00 (late check-out fee applies)</label><noscript><button class="btn ghost sm">Update bill</button></noscript></form>
+</div></div>
+<form method="post" class="panel" novalidate><div class="panel-h"><h3>Payment</h3></div><div class="panel-b stack tight">{{ csrf() }}
+  <input type="hidden" name="late" value="{{ 1 if late else 0 }}">
+  {% if bill.balance > 0 %}
+  {% for v, label in [('CASH','Cash'),('CARD','Bank card'),('E_WALLET','E-wallet')] %}<label class="pay"><input type="radio" name="method" value="{{ v }}"{% if method == v or (loop.first and method not in ('CARD','E_WALLET')) %} checked{% endif %}><span><b>{{ label }}</b></span></label>{% endfor %}
+  {% if cfg.demo_mode %}<label class="check hint"><input type="checkbox" name="decline" value="1"><span>Demo only: simulate a declined card or wallet</span></label>{% endif %}
+  {% else %}<div class="alert ok">{{ icon('check') }}<div>Nothing to collect. {% if bill.balance < 0 %}The deposit is larger than the bill, so the difference is queued as a refund.{% else %}The deposit already covers the bill.{% endif %}</div></div>{% endif %}
+  {{ alert(error) }}
+  <button class="btn lg block">Complete check-out and issue invoice</button>
+  <p class="hint">The room becomes Cleaning and the invoice cannot be changed afterwards.</p>
+</div></form>
+</div>
+{% endblock %}

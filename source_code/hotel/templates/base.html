@@ -1,0 +1,57 @@
+{% from "common/_macros.html" import icon, csrf %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Grand Horizon Hotel{% endblock %} – Grand Horizon Hotel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+{% include "common/_icons.html" %}
+{% if cfg.demo_mode %}
+<div class="util"><div class="wrap">
+  <span class="lbl">Demo mode: e-mail and payments are simulated</span>
+  <a class="sp" href="{{ url_for('common.outbox') }}">E-mail outbox</a>
+</div></div>
+{% endif %}
+{% set role = user.role if user else 'GUEST' %}
+{% set ep = request.endpoint or '' %}
+{% if role == 'RECEPTIONIST' %}
+  {% set nav = [('desk.dashboard','Front desk',['desk.dashboard']),('desk.pending','Pending',['desk.pending']),('desk.checkin_list','Check-in',['desk.checkin_list','desk.checkin_form']),('desk.inhouse','In-house',['desk.inhouse','desk.checkout','desk.services','desk.change_room']),('desk.rooms','Rooms',['desk.rooms']),('desk.search','Find booking',['desk.search'])] %}
+{% elif role == 'ADMIN' %}
+  {% set nav = [('admin.dashboard','Reports',['admin.dashboard','admin.revenue','admin.occupancy']),('admin.rooms','Rooms',['admin.rooms','admin.room_form']),('admin.room_types','Room types',['admin.room_types','admin.room_type_form','admin.prices']),('admin.services','Services',['admin.services']),('admin.staff','Staff',['admin.staff']),('admin.audit_log','Audit log',['admin.audit_log'])] %}
+{% else %}
+  {% set nav = [('public.home','Find a room',['public.home','public.room_detail','public.book','public.pay','public.confirmation'])] %}
+  {% if user %}{% set nav = nav + [('public.booking_list','My bookings',['public.booking_list','public.booking_detail','public.change','public.cancel']),('public.profile','Profile',['public.profile'])] %}{% endif %}
+{% endif %}
+<header class="site"><div class="wrap">
+  <a class="brand" href="{{ url_for('public.home') if role in ('GUEST','CUSTOMER') else (url_for('desk.dashboard') if role == 'RECEPTIONIST' else url_for('admin.dashboard')) }}">
+    <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 36V19a14 14 0 0 1 28 0v17" fill="none" stroke="#b8935a" stroke-width="2"/><path d="M12 36V20a8 8 0 0 1 16 0v16" fill="none" stroke="#14372f" stroke-width="2"/><path d="M3 28h34" stroke="#b8935a" stroke-width="2"/><circle cx="20" cy="22" r="3.6" fill="#b8935a"/></svg><b>Grand Horizon</b></a>
+  <nav class="nav" aria-label="Pages">{% for endpoint, label, group in nav %}<a href="{{ url_for(endpoint) }}" class="{{ 'on' if ep in group }}"{% if ep in group %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}</nav>
+  <div class="who">
+  {% if user %}
+    <a href="{{ url_for('public.profile') }}" class="avatar" aria-hidden="true" tabindex="-1">{{ initials(user.full_name) }}</a>
+    <div><b>{{ user.full_name }}</b><small>{{ {'CUSTOMER':'Customer','RECEPTIONIST':'Receptionist','ADMIN':'Admin'}[user.role] }}</small></div>
+    <form method="post" action="{{ url_for('public.logout') }}">{{ csrf() }}<button class="btn ghost sm">Sign out</button></form>
+  {% else %}
+    <a class="btn ghost sm" href="{{ url_for('public.login') }}">{{ icon('login','sm') }}Sign in</a>
+    <a class="btn sm" href="{{ url_for('public.register') }}">Register</a>
+  {% endif %}
+  </div>
+</div></header>
+<main id="view">
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+  {% if msgs or timed_out %}<div class="alerts" role="status">
+    {% if timed_out %}<div class="alert info">{{ icon('info') }}<div>You were signed out after {{ cfg.session_minutes }} minutes without activity. Sign in again to continue.</div></div>{% endif %}
+    {% for cat, msg in msgs %}<div class="alert {{ 'ok' if cat == 'ok' else ('bad' if cat == 'bad' else 'info') }}">{{ icon('check' if cat == 'ok' else ('warn' if cat == 'bad' else 'info')) }}<div>{{ msg }}</div></div>{% endfor %}
+  </div>{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer class="foot"><div class="wrap"><span>Grand Horizon Hotel, room booking system</span><span>Software Engineering, Group 7</span></div></footer>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

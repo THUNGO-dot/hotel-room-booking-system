@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, header, act %}
+{% block title %}Room types and prices{% endblock %}
+{% block content %}
+{{ header('Room types and prices', 'Change what guests can book and what it costs. New prices apply to new bookings only.') }}
+<div class="row" style="justify-content:flex-end;margin-bottom:16px"><a class="btn" href="{{ url_for('admin.room_type_form') }}">{{ icon('plus','sm') }}Add room type</a></div>
+<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Room type</th><th>Beds</th><th class="r">Guests</th><th class="r">Rooms</th><th class="r">Current rate</th><th class="r">Actions</th></tr></thead><tbody>
+{% for t in types %}<tr><td><b>{{ t.name }}</b><div class="chips">{% for a in amen(t) %}<span class="chip">{{ a }}</span>{% endfor %}</div></td><td>{{ t.bed_type }}</td><td class="r num">{{ t.capacity }}</td><td class="r num">{{ t.rooms }}</td>
+  <td class="r num">{% if rates[t.room_type_id] %}{{ rates[t.room_type_id]|vnd }}{% else %}<span class="hint">No price set</span>{% endif %}</td>
+  <td class="r"><div class="row end"><a class="btn ghost sm" href="{{ url_for('admin.prices', type_id=t.room_type_id) }}">Prices</a><a class="btn ghost sm" href="{{ url_for('admin.room_type_form', type_id=t.room_type_id) }}">Edit</a>{{ act(url_for('admin.room_type_delete', type_id=t.room_type_id), 'Delete', 'btn ghost sm', 'Delete room type ' ~ t.name ~ '? A type with booking history is only hidden.') }}</div></td></tr>
+{% else %}<tr><td colspan="6"><div class="empty"><b>No room types yet</b></div></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

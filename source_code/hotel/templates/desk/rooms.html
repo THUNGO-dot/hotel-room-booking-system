@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, header, pill %}
+{% block title %}Rooms{% endblock %}
+{% block content %}
+{{ header('Room board', 'Mark rooms as cleaned or out of service. Occupied rooms change automatically at check-in and check-out.') }}
+<div class="board">
+{% for r in rooms %}<div class="rcell {{ ROOM_STATUS[r.status] }}"><span class="rn">{{ r.room_number }}</span><span class="hint">{{ r.type_name }}, floor {{ r.floor }}</span>{{ pill(ROOM_STATUS[r.status], r.status|capitalize) }}
+  {% if r.status != 'OCCUPIED' %}<form method="post" action="{{ url_for('desk.room_status', room_id=r.room_id) }}" class="row" style="gap:6px">{{ csrf() }}
+    <select class="input" name="status" style="height:34px;font-size:13px">{% for v, l in [('AVAILABLE','Available'),('CLEANING','Cleaning'),('MAINTENANCE','Maintenance')] %}<option value="{{ v }}"{% if r.status == v %} selected{% endif %}>{{ l }}</option>{% endfor %}</select><button class="btn ghost sm">Set</button></form>{% endif %}</div>
+{% endfor %}</div>
+{% endblock %}

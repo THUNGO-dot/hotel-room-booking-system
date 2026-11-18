@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% from "common/_macros.html" import header, booking_pill, pager, act %}
+{% block title %}Find a booking{% endblock %}
+{% block content %}
+{{ header('Find a booking', 'Search by booking code, guest name or phone number. You can cancel on behalf of a guest.') }}
+<form class="filters" method="get"><input class="input" type="search" name="q" value="{{ q }}" placeholder="HB-20261105-0001, name or phone" style="min-width:320px" autofocus><button class="btn">Search</button></form>
+<div class="panel mt"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Booking</th><th>Guest</th><th>Room type</th><th>Stay</th><th>Status</th><th class="r">Actions</th></tr></thead><tbody>
+{% for b in p.items %}<tr>{% include "desk/_booking_row.html" %}<td>{{ booking_pill(b) }}</td>
+  <td class="r">{% if b.status in ('PENDING','CONFIRMED') %}{{ act(url_for('desk.cancel', code=b.booking_code), 'Cancel booking', 'btn ghost sm', 'Cancel booking ' ~ b.booking_code ~ '? The refund follows the cancellation policy.', {'back': request.full_path}) }}
+    {% elif b.status == 'CHECKED_IN' %}<a class="btn ghost sm" href="{{ url_for('desk.checkout', code=b.booking_code) }}">Check out</a>
+    {% elif b.status == 'COMPLETED' %}<span class="hint">Closed</span>{% endif %}</td></tr>
+{% else %}<tr><td colspan="6"><div class="empty"><b>{{ 'No booking matches' if q else 'Type something to search' }}</b>{{ 'Check the spelling or try the phone number.' if q else 'Booking code, name or phone number.' }}</div></td></tr>{% endfor %}
+</tbody></table></div>{{ pager(p) }}</div>
+{% endblock %}

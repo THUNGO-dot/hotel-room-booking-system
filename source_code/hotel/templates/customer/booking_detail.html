@@ -1,0 +1,36 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, booking_pill, sumrows, act %}
+{% block title %}Booking {{ b.booking_code }}{% endblock %}
+{% block content %}
+{% set reached = 1 + (1 if b.paid >= b.deposit_amount and b.deposit_amount > 0 else 0) + (1 if b.status in ('CONFIRMED','CHECKED_IN','COMPLETED') else 0) + (1 if b.status == 'COMPLETED' else 0) %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('public.booking_list') }}">← My bookings</a></p>
+  <h1>{{ b.booking_code }}</h1><div class="row">{{ booking_pill(b) }}<span class="hint">Created {{ b.created_at|dmyhm }}</span></div></div>
+<div class="cols c2 wide">
+  <div class="stack">
+    {% if b.status in ('PENDING','CONFIRMED','CHECKED_IN','COMPLETED') %}
+    <div class="panel"><div class="panel-b"><ol class="tl">{% for s in steps %}<li class="{{ 'on' if loop.index <= reached }}">{{ s }}</li>{% endfor %}</ol></div></div>{% endif %}
+    <div class="panel"><div class="panel-h"><h3>Stay</h3></div><div class="panel-b"><dl class="kv">
+      <dt>Room type</dt><dd>{{ b.type_name }}</dd>
+      <dt>Room number</dt><dd>{{ b.room_number or 'Assigned at check-in' }}</dd>
+      <dt>Check-in</dt><dd>{{ b.check_in_date|dmy }} (from {{ cfg.checkin_hour }}:00)</dd>
+      <dt>Check-out</dt><dd>{{ b.check_out_date|dmy }} (by {{ cfg.late_checkout_hour }}:00)</dd>
+      <dt>Nights</dt><dd>{{ nights }}</dd>
+      <dt>Guests</dt><dd>{{ b.guests }}</dd>
+      <dt>Guest</dt><dd>{{ b.guest_name }}, {{ b.guest_phone }}</dd>
+      {% if b.special_request %}<dt>Requests</dt><dd>{{ b.special_request }}</dd>{% endif %}
+    </dl></div></div>
+  </div>
+  <div class="stack">
+    <div class="panel"><div class="panel-h"><h3>Payment</h3></div><div class="panel-b stack tight">
+      {{ sumrows([('Room total', b.room_charge|vnd), ('Deposit required', b.deposit_amount|vnd), ('Paid so far', b.paid|vnd)], ('Balance at check-out', (b.room_charge - b.paid)|vnd)) }}
+      {% if b.status == 'PENDING' and due > 0 %}<p class="hint">Pay before {{ b.hold_expires_at|dmyhm }} or the room is released.</p><a class="btn block" href="{{ url_for('public.pay', code=b.booking_code) }}">Pay deposit {{ due|vnd }}</a>{% endif %}
+      {% if invoice %}<a class="btn block" href="{{ url_for('common.invoice', invoice_no=invoice.invoice_no) }}">{{ icon('print','sm') }}View invoice {{ invoice.invoice_no }}</a>{% endif %}
+    </div></div>
+    {% if live %}
+    <div class="panel"><div class="panel-h"><h3>Manage</h3></div><div class="panel-b stack tight">
+      {% if can_change %}<a class="btn ghost block" href="{{ url_for('public.change', code=b.booking_code) }}">Change dates</a>
+      {% else %}<p class="hint">Dates can be changed up to {{ cfg.change_min_hours }} hours before check-in.</p>{% endif %}
+      <a class="btn ghost block" href="{{ url_for('public.cancel', code=b.booking_code) }}">Cancel booking</a>
+    </div></div>{% endif %}
+  </div>
+</div>
+{% endblock %}

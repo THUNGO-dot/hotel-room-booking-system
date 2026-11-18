@@ -1,0 +1,9 @@
+services:
+  hotel:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - hotel-data:/app/instance
+volumes:
+  hotel-data:

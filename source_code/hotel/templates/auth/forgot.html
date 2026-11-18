@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field %}
+{% block title %}Reset password{% endblock %}
+{% block content %}
+<div class="panel auth"><div class="panel-h"><h2>Reset your password</h2></div><div class="panel-b">
+  <p class="hint">Enter the email you sign in with. We send a code that works once and expires in {{ cfg.reset_code_minutes }} minutes.</p>
+  <form method="post" class="stack tight" novalidate>{{ csrf() }}
+    {{ field('email', 'Email', email, 'email', True, 'autofocus') }}
+    {{ alert(error) }}
+    <button class="btn lg block">Send reset code</button>
+  </form>
+  <a class="link" href="{{ url_for('public.login') }}">Back to sign in</a>
+</div></div>
+{% endblock %}

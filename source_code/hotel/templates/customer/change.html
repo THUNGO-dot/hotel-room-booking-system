@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% from "common/_macros.html" import icon, csrf, alert, sumrows %}
+{% block title %}Change dates{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('public.booking_detail', code=b.booking_code) }}">← Back to booking</a></p><h1>Change dates</h1><p>{{ b.booking_code }}, {{ b.type_name }}</p></div>
+<div class="cols c2 wide">
+<div class="panel"><div class="panel-b stack tight">
+  <form method="get" class="stack tight" novalidate>
+    <div class="cols c2" style="gap:12px">
+      <label class="field"><span>New check-in</span><input class="input" type="date" name="ci" value="{{ ci }}" min="{{ today_iso() }}"></label>
+      <label class="field"><span>New check-out</span><input class="input" type="date" name="co" value="{{ co }}"></label></div>
+    <button class="btn ghost">Check price and availability</button>
+  </form>
+  {{ alert(error) }}
+  {% if preview %}
+  {{ sumrows([('Current stay', (b.check_in_date|dmy) ~ ' to ' ~ (b.check_out_date|dmy)), ('New stay', (ci|dmy) ~ ' to ' ~ (co|dmy)), ('New nights', preview.nights), ('Current total', b.room_charge|vnd)], ('New total', preview.total|vnd)) }}
+  {% if preview.left <= 0 %}<div class="alert bad">{{ icon('warn') }}<div>No room of this type is free on the new dates. <span class="hint">({{ mcode('NO_ROOM') }})</span></div></div>
+  {% else %}
+  <p class="hint">New deposit: <b>{{ preview.deposit|vnd }}</b>. You have paid {{ b.paid|vnd }}{% if preview.deposit > b.paid %}, so {{ (preview.deposit - b.paid)|vnd }} more is due after you confirm{% endif %}.</p>
+  <form method="post" class="row">{{ csrf() }}<input type="hidden" name="ci" value="{{ ci }}"><input type="hidden" name="co" value="{{ co }}"><button class="btn">Confirm new dates</button></form>
+  {% endif %}{% endif %}
+</div></div>
+<div class="panel"><div class="panel-h"><h3>Good to know</h3></div><div class="panel-b stack tight">
+  <p>Dates can be changed until {{ cfg.change_min_hours }} hours before check-in, once per request, subject to availability.</p>
+  <p>The new price is worked out from the price list for the new dates. A change may need a larger deposit.</p></div></div>
+</div>
+{% endblock %}

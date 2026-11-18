@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field, act %}
+{% block title %}Prices for {{ t.name }}{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('admin.room_types') }}">← Room types</a></p><h1>Prices, {{ t.name }}</h1><p>Price periods must not overlap. A booking uses the price of each night it covers.</p></div>
+<div class="cols c2 wide">
+<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>From</th><th>To</th><th class="r">Per night</th><th class="r">Actions</th></tr></thead><tbody>
+{% for p in periods %}<tr><td class="num">{{ p.start_date|dmy }}</td><td class="num">{{ p.end_date|dmy }}</td><td class="r num"><b>{{ p.price_per_night|vnd }}</b></td>
+  <td class="r"><div class="row end"><a class="btn ghost sm" href="{{ url_for('admin.prices', type_id=t.room_type_id, edit=p.price_period_id) }}">Edit</a>{{ act(url_for('admin.price_delete', period_id=p.price_period_id), 'Remove', 'btn ghost sm', 'Remove this price period?', {'type_id': t.room_type_id}) }}</div></td></tr>
+{% else %}<tr><td colspan="4"><div class="empty"><b>No prices yet</b>Add the first period on the right.</div></td></tr>{% endfor %}</tbody></table></div></div>
+<form method="post" class="panel" novalidate><div class="panel-h"><h3>{{ 'Edit period' if editing else 'Add period' }}</h3></div><div class="panel-b stack tight">{{ csrf() }}
+  {% if editing %}<input type="hidden" name="period_id" value="{{ editing.price_period_id }}">{% endif %}
+  {{ field('start', 'From', f.get('start', editing.start_date if editing else ''), 'date', True) }}
+  {{ field('end', 'To', f.get('end', editing.end_date if editing else ''), 'date', True) }}
+  {{ field('price', 'Price per night (VND)', f.get('price', editing.price_per_night|int if editing else ''), 'number', True, 'min="1" step="1000"') }}
+  {{ alert(error) }}
+  <div class="row"><button class="btn">Save period</button>{% if editing %}<a class="btn ghost" href="{{ url_for('admin.prices', type_id=t.room_type_id) }}">Cancel edit</a>{% endif %}</div>
+</div></form>
+</div>
+{% endblock %}

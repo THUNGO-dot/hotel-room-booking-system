@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% from "common/_macros.html" import header, pager %}
+{% block title %}Check-in{% endblock %}
+{% block content %}
+{{ header('Check-in', 'Confirmed bookings whose arrival date has been reached') }}
+<form class="filters" method="get"><input class="input" type="search" name="q" value="{{ q }}" placeholder="Booking code, name or phone" style="min-width:300px"><button class="btn ghost">Search</button></form>
+<div class="panel mt"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Booking</th><th>Guest</th><th>Room type</th><th>Stay</th><th class="r">Action</th></tr></thead><tbody>
+{% for b in p.items %}<tr>{% include "desk/_booking_row.html" %}<td class="r"><a class="btn sm" href="{{ url_for('desk.checkin_form', code=b.booking_code) }}">Check in</a></td></tr>
+{% else %}<tr><td colspan="5"><div class="empty"><b>No guests waiting</b>{{ 'No arrival matches your search.' if q else 'Confirmed guests appear here from their arrival date.' }}</div></td></tr>{% endfor %}
+</tbody></table></div>{{ pager(p) }}</div>
+{% endblock %}

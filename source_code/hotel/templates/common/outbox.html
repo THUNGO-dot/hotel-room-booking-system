@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% from "common/_macros.html" import header %}
+{% block title %}E-mail outbox{% endblock %}
+{% block content %}
+{{ header('Simulated e-mail outbox', 'Demo mode only. These are the messages the system would send through the e-mail service.') }}
+<div class="stack">
+{% for m in mails %}<div class="mail"><div class="hint">{{ m.at|dmyhm }} · To {{ m.to }}</div><b>{{ m.subject }}</b><hr><pre>{{ m.body }}</pre></div>
+{% else %}<div class="panel empty"><b>No e-mails yet</b>Confirmations and password reset codes appear here.</div>{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{# one booking in a front-desk table; needs b #}
+<td class="nw"><span class="code">{{ b.booking_code }}</span></td>
+<td class="nw">{{ b.guest_name }}<div class="hint">{{ b.guest_phone }}</div></td>
+<td class="nw">{{ b.type_name }}{% if b.room_number %}<div class="hint">Room {{ b.room_number }}</div>{% endif %}</td>
+<td class="num">{{ b.check_in_date|dmy }} to {{ b.check_out_date|dmy }}</td>

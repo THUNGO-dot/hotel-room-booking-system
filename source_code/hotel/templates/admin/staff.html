@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field, header, pill, pager, act %}
+{% block title %}Staff accounts{% endblock %}
+{% block content %}
+{{ header('Staff accounts', 'Create receptionist and admin accounts, lock them or reset their passwords') }}
+<div class="cols c2 wide">
+<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Status</th><th class="r">Actions</th></tr></thead><tbody>
+{% for a in p.items %}<tr><td><b>{{ a.full_name }}</b>{% if a.account_id == user.account_id %} <span class="hint">(you)</span>{% endif %}<div class="hint">{{ a.role|capitalize }}, {{ a.email }}</div><div class="hint">{{ a.phone }}</div></td>
+  <td>{{ pill('bad' if a.status == 'LOCKED' else 'ok', 'Locked' if a.status == 'LOCKED' else 'Active') }}</td>
+  <td class="r"><div class="row end">
+    {% if a.status == 'LOCKED' %}{{ act(url_for('admin.staff_lock', account_id=a.account_id), 'Unlock', 'btn ghost sm', '', {'locked': 0}) }}
+    {% else %}{{ act(url_for('admin.staff_lock', account_id=a.account_id), 'Lock', 'btn ghost sm', 'Lock the account of ' ~ a.full_name ~ '?', {'locked': 1}) }}{% endif %}
+    {{ act(url_for('admin.staff_reset', account_id=a.account_id), 'Reset password', 'btn ghost sm', 'Send ' ~ a.full_name ~ ' a new temporary password?') }}</div></td></tr>
+{% endfor %}</tbody></table></div>{{ pager(p) }}</div>
+<form method="post" class="panel" novalidate><div class="panel-h"><h3>New staff account</h3></div><div class="panel-b stack tight">{{ csrf() }}
+  {{ field('name', 'Full name', f.get('name'), 'text', True) }}
+  {{ field('email', 'Email', f.get('email'), 'email', True) }}
+  {{ field('phone', 'Phone number', f.get('phone'), 'tel', True) }}
+  <label class="field"><span>Role</span><select class="input" name="role"><option value="RECEPTIONIST"{% if f.get('role') != 'ADMIN' %} selected{% endif %}>Receptionist</option><option value="ADMIN"{% if f.get('role') == 'ADMIN' %} selected{% endif %}>Admin</option></select></label>
+  {{ alert(error) }}
+  <button class="btn">Create account</button><p class="hint">A temporary password is e-mailed to the new user.</p>
+</div></form>
+</div>
+{% endblock %}

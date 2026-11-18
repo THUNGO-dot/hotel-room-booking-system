@@ -1,0 +1,16 @@
+# runtime data (rebuilt on first start)
+instance/
+*.db
+*.db-wal
+*.db-shm
+outbox.jsonl
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# earlier drafts kept only for reference
+_draft_archive/

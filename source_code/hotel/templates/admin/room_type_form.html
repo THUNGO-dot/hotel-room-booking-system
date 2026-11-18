@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field %}
+{% block title %}{{ 'Edit ' ~ t.name if t else 'Add room type' }}{% endblock %}
+{% block content %}
+<div class="ph compact"><p><a class="link" href="{{ url_for('admin.room_types') }}">← Room types</a></p><h1>{{ 'Edit ' ~ t.name if t else 'Add room type' }}</h1></div>
+<form method="post" class="panel" style="max-width:640px" novalidate><div class="panel-b stack tight">{{ csrf() }}
+  {{ field('name', 'Name', v.get('name'), 'text', True, 'maxlength="50"') }}
+  {{ field('bed', 'Bed type', v.get('bed'), 'text', True, 'maxlength="30" placeholder="1 king bed"') }}
+  <div class="cols c2" style="gap:12px">{{ field('capacity', 'Maximum guests', v.get('capacity'), 'number', True, 'min="1" max="8"') }}{{ field('area', 'Area (m²)', v.get('area'), 'number', True, 'min="5" max="500"') }}</div>
+  {{ field('amenities', 'Amenities', v.get('amenities'), 'text', False, 'maxlength="255"', 'Separate with commas: Wi-Fi, Breakfast, Air conditioning') }}
+  <label class="field"><span>Description</span><textarea class="input" name="description" rows="3" maxlength="500">{{ v.get('description') or '' }}</textarea></label>
+  {{ alert(error) }}
+  <div class="row"><button class="btn">Save room type</button><a class="btn ghost" href="{{ url_for('admin.room_types') }}">Cancel</a></div>
+  {% if not t %}<p class="hint">After saving, set a price for the type. A type with no price cannot be booked.</p>{% endif %}
+</div></form>
+{% endblock %}

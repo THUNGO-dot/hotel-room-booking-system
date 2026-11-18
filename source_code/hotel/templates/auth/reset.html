@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% from "common/_macros.html" import csrf, alert, field %}
+{% block title %}Enter reset code{% endblock %}
+{% block content %}
+<div class="panel auth"><div class="panel-h"><h2>Choose a new password</h2></div><div class="panel-b">
+  <form method="post" class="stack tight" novalidate>{{ csrf() }}
+    {{ field('email', 'Email', email, 'email', True) }}
+    {{ field('code', '6-digit code from the email', '', 'text', True, 'inputmode="numeric" autocomplete="one-time-code" maxlength="6"') }}
+    {{ field('password', 'New password', '', 'password', True, 'autocomplete="new-password"', 'At least ' ~ cfg.min_password_length ~ ' characters.') }}
+    {{ alert(error) }}
+    <button class="btn lg block">Update password</button>
+  </form>
+  {% if cfg.demo_mode %}<div class="demo">Demo: the code is in the <a class="link" href="{{ url_for('common.outbox') }}">simulated e-mail outbox</a>.</div>{% endif %}
+  <a class="link" href="{{ url_for('public.forgot') }}">Send a new code</a>
+</div></div>
+{% endblock %}

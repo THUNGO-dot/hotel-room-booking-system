@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% from "common/_macros.html" import header, pager %}
+{% block title %}Audit log{% endblock %}
+{% block content %}
+{{ header('Audit log', 'Every change staff make to bookings, prices, rooms and accounts') }}
+<div class="panel"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Record</th><th>Details</th></tr></thead><tbody>
+{% for l in p.items %}<tr><td class="num">{{ l.created_at|dmyhm }}</td><td>{{ l.full_name }}<div class="hint">{{ l.role|capitalize }}</div></td><td><span class="code">{{ l.action }}</span></td><td>{{ l.entity_type }}{% if l.entity_id %} #{{ l.entity_id }}{% endif %}</td><td>{{ l.details or '' }}</td></tr>
+{% else %}<tr><td colspan="5"><div class="empty"><b>Nothing logged yet</b></div></td></tr>{% endfor %}</tbody></table></div>{{ pager(p) }}</div>
+{% endblock %}
